@@ -9,9 +9,11 @@
 
 const logger = require('../../src/common/logger')
 const helper = require('../../src/common/helper')
-const { topResources } = require('../../src/common/constants')
+const { topResources, userResources } = require('../../src/common/constants')
 
 let client
+
+let needsNestedTypes = ['user']
 
 /**
  * Initialize elastic search index
@@ -31,6 +33,25 @@ const init = async (isForce) => {
     } else {
       logger.info(`The index ${topResources[key].index} will be created.`)
       await client.indices.create({ index: topResources[key].index })
+
+      if (needsNestedTypes.includes(topResources[key] === 'user')) {
+        for (const childKey in userResources) {
+          if (userResources[key].isNested) {
+            await client.indices.putMapping({
+              index: topResources[key].index,
+              type: topResources[key].type,
+              include_type_name: true,
+              body: {
+                properties: {
+                  [userResources[childKey].propertyName]: {
+                    type: 'nested'
+                  }
+                }
+              }
+            })
+          }
+        }
+      }
     }
   }
 }

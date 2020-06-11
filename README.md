@@ -25,7 +25,7 @@ The following parameters can be set in config files or in env variables:
 - UBAHN_DELETE_TOPIC: the delete ubahn entity Kafka message topic, default value is 'u-bahn.action.delete'
 - ES.HOST: Elasticsearch host, default value is 'localhost:9200'
 - ES.AWS_REGION: The Amazon region to use when using AWS Elasticsearch service, default value is 'us-east-1'
-- ES.API_VERSION: Elasticsearch API version, default value is '6.8'
+- ES.API_VERSION: Elasticsearch API version, default value is '7.4'
 - ES.ACHIEVEMENT_PROVIDER_INDEX: Elasticsearch index name for achievement provider, default value is 'achievement_provider'
 - ES.ACHIEVEMENT_PROVIDER_TYPE: Elasticsearch index type for achievement provider, default value is '_doc'
 - ES.ATTRIBUTE_INDEX: Elasticsearch index name for attribute, default value is 'attribute'

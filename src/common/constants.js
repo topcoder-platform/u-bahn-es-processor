@@ -55,7 +55,8 @@ const userResources = {
   userattribute: {
     propertyName: config.get('ES.USER_ATTRIBUTE_PROPERTY_NAME'),
     relateKey: 'attributeId',
-    validate: payload => validProperties(payload, ['userId', 'attributeId'])
+    validate: payload => validProperties(payload, ['userId', 'attributeId']),
+    isNested: true // For ES index creation
   },
   userrole: {
     propertyName: config.get('ES.USER_ROLE_PROPERTY_NAME'),

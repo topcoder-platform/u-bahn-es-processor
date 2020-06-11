@@ -21,7 +21,7 @@ module.exports = {
   ES: {
     HOST: process.env.ES_HOST || 'localhost:9200',
     AWS_REGION: process.env.AWS_REGION || 'us-east-1', // AWS Region to be used if we use AWS ES
-    API_VERSION: process.env.ES_API_VERSION || '6.8',
+    API_VERSION: process.env.ES_API_VERSION || '7.4',
     ACHIEVEMENT_PROVIDER_INDEX: process.env.ACHIEVEMENT_PROVIDER_INDEX || 'achievement_provider',
     ACHIEVEMENT_PROVIDER_TYPE: process.env.ACHIEVEMENT_PROVIDER_TYPE || '_doc',
     ATTRIBUTE_INDEX: process.env.ATTRIBUTE_INDEX || 'attribute',
