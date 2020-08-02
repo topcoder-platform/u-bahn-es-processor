@@ -3,7 +3,7 @@
  */
 const _ = require('lodash')
 const helper = require('../../src/common/helper')
-const { topResources, userResources } = require('../../src/common/constants')
+const { topResources, userResources, organizationResources } = require('../../src/common/constants')
 
 var client
 (async function () {
@@ -22,6 +22,15 @@ async function getESRecord (payload) {
       type: topResources[payload.resource].type,
       id: payload.id
     })
+  } else if (organizationResources[payload.resource]) {
+    const orgResource = organizationResources[payload.resource]
+    const org = await helper.getOrg(payload.organizationId)
+    if (!org || !org[orgResource.propertyName] || !_.some(org[orgResource.propertyName], [orgResource.relateKey, payload[orgResource.relateKey]])) {
+      const err = Error('[resource_not_found_exception]')
+      err.statusCode = 404
+      throw err
+    }
+    return _.find(org[orgResource.propertyName], [orgResource.relateKey, payload[orgResource.relateKey]])
   } else {
     const userResource = userResources[payload.resource]
     const user = await helper.getUser(payload.userId)

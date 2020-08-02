@@ -6,7 +6,11 @@ const _ = require('lodash')
 const Joi = require('@hapi/joi')
 const logger = require('../common/logger')
 const helper = require('../common/helper')
-const { topResources, userResources } = require('../common/constants')
+const {
+  topResources,
+  userResources,
+  organizationResources
+} = require('../common/constants')
 
 /**
  * Process create entity message
@@ -43,8 +47,26 @@ async function processCreate (message) {
       user[userResource.propertyName].push(_.omit(message.payload, 'resource'))
       await helper.updateUser(message.payload.userId, user)
     }
+  } else if (_.includes(_.keys(organizationResources), resource)) {
+    // process org resources such as org skill provider
+    const orgResources = organizationResources[resource]
+    orgResources.validate(message.payload)
+    const org = await helper.getOrg(message.payload.organizationId)
+    const relateId = message.payload[orgResources.relateKey]
+    if (!org[orgResources.propertyName]) {
+      org[orgResources.propertyName] = []
+    }
+
+    // check the resource does not exist
+    if (_.some(org[orgResources.propertyName], [orgResources.relateKey, relateId])) {
+      logger.error(`Can't create existing ${resource} with the ${orgResources.relateKey}: ${relateId}, organizationId: ${message.payload.organizationId}`)
+      throw helper.getErrorWithStatus('[version_conflict_engine_exception]', 409)
+    } else {
+      org[orgResources.propertyName].push(_.omit(message.payload, 'resource'))
+      await helper.updateOrg(message.payload.organizationId, org)
+    }
   } else {
-    logger.info(`Ignore this message since resource is not in [${_.union(_.keys(topResources), _.keys(userResources))}]`)
+    logger.info(`Ignore this message since resource is not in [${_.union(_.keys(topResources), _.keys(userResources), _.keys(organizationResources))}]`)
   }
 }
 
@@ -90,8 +112,24 @@ async function processUpdate (message) {
       user[userResource.propertyName].splice(updateIndex, 1, _.omit(message.payload, 'resource'))
       await helper.updateUser(message.payload.userId, user)
     }
+  } else if (_.includes(_.keys(organizationResources), resource)) {
+    // process org resources such as org skill providers
+    const orgResource = organizationResources[resource]
+    orgResource.validate(message.payload)
+    const org = await helper.getOrg(message.payload.organizationId)
+    const relateId = message.payload[orgResource.relateKey]
+
+    // check the resource exist
+    if (!org[orgResource.propertyName] || !_.some(org[orgResource.propertyName], [orgResource.relateKey, relateId])) {
+      logger.error(`The ${resource} with the ${orgResource.relateKey}: ${relateId}, organizationId: ${message.payload.organizationId} not exist`)
+      throw helper.getErrorWithStatus('[resource_not_found_exception]', 404)
+    } else {
+      const updateIndex = _.findIndex(org[orgResource.propertyName], [orgResource.relateKey, relateId])
+      org[orgResource.propertyName].splice(updateIndex, 1, _.omit(message.payload, 'resource'))
+      await helper.updateOrg(message.payload.organizationId, org)
+    }
   } else {
-    logger.info(`Ignore this message since resource is not in [${_.union(_.keys(topResources), _.keys(userResources))}]`)
+    logger.info(`Ignore this message since resource is not in [${_.union(_.keys(topResources), _.keys(userResources), _.keys(organizationResources))}]`)
   }
 }
 
@@ -138,8 +176,23 @@ async function processDelete (message) {
       _.remove(user[userResource.propertyName], [userResource.relateKey, relateId])
       await helper.updateUser(message.payload.userId, user)
     }
+  } else if (_.includes(_.keys(organizationResources), resource)) {
+    // process user resources such as org skill provider
+    const orgResource = organizationResources[resource]
+    orgResource.validate(message.payload)
+    const org = await helper.getOrg(message.payload.organizationId)
+    const relateId = message.payload[orgResource.relateKey]
+
+    // check the resource exist
+    if (!org[orgResource.propertyName] || !_.some(org[orgResource.propertyName], [orgResource.relateKey, relateId])) {
+      logger.error(`The ${resource} with the ${orgResource.relateKey}: ${relateId}, organizationId: ${message.payload.organizationId} not exist`)
+      throw helper.getErrorWithStatus('[resource_not_found_exception]', 404)
+    } else {
+      _.remove(org[orgResource.propertyName], [orgResource.relateKey, relateId])
+      await helper.updateOrg(message.payload.organizationId, org)
+    }
   } else {
-    logger.info(`Ignore this message since resource is not in [${_.union(_.keys(topResources), _.keys(userResources))}]`)
+    logger.info(`Ignore this message since resource is not in [${_.union(_.keys(topResources), _.keys(userResources), _.keys(organizationResources))}]`)
   }
 }
 

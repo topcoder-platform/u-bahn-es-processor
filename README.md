@@ -47,6 +47,7 @@ The following parameters can be set in config files or in env variables:
 - ES.USER_ATTRIBUTE_PROPERTY_NAME: the user property name of attribute, default value is 'attributes',
 - ES.USER_ROLE_PROPERTY_NAME: the user property name of role, default value is 'roles',
 - ES.USER_SKILL_PROPERTY_NAME: the user property name of skill, default value is 'skills'
+- ES.ORGANIZATION_SKILLPROVIDER_PROPERTY_NAME: the org property name of org skill providers, default value is 'skillProviders'
 
 There is a `/health` endpoint that checks for the health of the app. This sets up an expressjs server and listens on the environment variable `PORT`. It's not part of the configuration file and needs to be passed as an environment variable
 

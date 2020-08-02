@@ -70,6 +70,14 @@ const userResources = {
   }
 }
 
+const organizationResources = {
+  organizationskillprovider: {
+    propertyName: config.get('ES.ORGANIZATION_SKILLPROVIDER_PROPERTY_NAME'),
+    relateKey: 'skillProviderId',
+    validate: payload => validProperties(payload, ['organizationId', 'skillProviderId'])
+  }
+}
+
 module.exports = {
-  topResources, userResources
+  topResources, userResources, organizationResources
 }

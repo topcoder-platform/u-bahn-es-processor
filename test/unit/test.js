@@ -7,7 +7,7 @@ global.Promise = require('bluebird')
 const _ = require('lodash')
 const should = require('should')
 const logger = require('../../src/common/logger')
-const { topResources, userResources } = require('../../src/common/constants')
+const { topResources, userResources, organizationResources } = require('../../src/common/constants')
 const service = require('../../src/services/ProcessorService')
 const { fields, testTopics } = require('../common/testData')
 const { getESRecord } = require('../common/testHelper')
@@ -174,7 +174,7 @@ describe('UBahn - Elasticsearch Data Processor Unit Test', () => {
       const message = _.cloneDeep(testTopics[op][0])
       message.payload.resource = 'invalid'
       await service[`process${op}`](message)
-      should.equal(_.last(infoLogs), `Ignore this message since resource is not in [${_.union(_.keys(topResources), _.keys(userResources))}]`)
+      should.equal(_.last(infoLogs), `Ignore this message since resource is not in [${_.union(_.keys(topResources), _.keys(userResources), _.keys(organizationResources))}]`)
     })
   }
 })

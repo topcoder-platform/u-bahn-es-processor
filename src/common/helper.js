@@ -95,6 +95,32 @@ async function updateUser (userId, body) {
 }
 
 /**
+ * Function to get org from es
+ * @param {String} organizationId
+ * @returns {Object} organization
+ */
+async function getOrg (organizationId) {
+  const client = await getESClient()
+  return client.getSource({ index: config.get('ES.ORGANIZATION_INDEX'), type: config.get('ES.ORGANIZATION_TYPE'), id: organizationId })
+}
+
+/**
+ * Function to update es organization
+ * @param {String} organizationId
+ * @param {Object} body
+ */
+async function updateOrg (organizationId, body) {
+  const client = await getESClient()
+  await client.update({
+    index: config.get('ES.ORGANIZATION_INDEX'),
+    type: config.get('ES.ORGANIZATION_TYPE'),
+    id: organizationId,
+    body: { doc: body },
+    refresh: 'true'
+  })
+}
+
+/**
  * Fuction to get an Error with statusCode property
  * @param {String} message error message
  * @param {Number} statusCode
@@ -112,5 +138,7 @@ module.exports = {
   validProperties,
   getUser,
   updateUser,
+  getOrg,
+  updateOrg,
   getErrorWithStatus
 }

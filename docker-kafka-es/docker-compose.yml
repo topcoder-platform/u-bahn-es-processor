@@ -14,8 +14,8 @@ services:
       KAFKA_ADVERTISED_HOST_NAME: localhost
       KAFKA_CREATE_TOPICS: "u-bahn.action.create:1:1,u-bahn.action.update:1:1,u-bahn.action.delete:1:1"
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-  esearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.8.0
-    container_name: ubahn-data-processor-es_es
-    ports:
-      - "9200:9200"
+  # esearch:
+  #   image: docker.elastic.co/elasticsearch/elasticsearch:7.4.2
+  #   container_name: ubahn-data-processor-es_es
+  #   ports:
+  #     - "9200:9200"

@@ -1,4 +1,9 @@
 /**
+ * !OBSOLETE SCRIPT. Use the one from ubahn-api instead
+ * !( https://github.com/topcoder-platform/u-bahn-api )
+ */
+
+/**
  * Initialize elastic search.
  * It will create configured index in elastic search if it is not present.
  * It can delete and re-create index if providing an extra 'force' argument.
