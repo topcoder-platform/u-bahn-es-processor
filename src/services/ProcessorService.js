@@ -26,8 +26,7 @@ async function processCreate (message) {
       index: topResources[resource].index,
       type: topResources[resource].type,
       id: message.payload.id,
-      body: _.omit(message.payload, 'resource'),
-      refresh: 'true'
+      body: _.omit(message.payload, 'resource')
     })
   } else if (_.includes(_.keys(userResources), resource)) {
     // process user resources such as userSkill, userAttribute...
@@ -96,7 +95,14 @@ async function processUpdate (message) {
     const { index, type } = topResources[resource]
     const id = message.payload.id
     const source = await client.getSource({ index, type, id })
-    await client.update({ index, type, id, body: { doc: _.assign(source, _.omit(message.payload, 'resource')) }, refresh: 'true' })
+    await client.update({
+      index,
+      type,
+      id,
+      body: {
+        doc: _.assign(source, _.omit(message.payload, 'resource'))
+      }
+    })
   } else if (_.includes(_.keys(userResources), resource)) {
     // process user resources such as userSkill, userAttribute...
     const userResource = userResources[resource]
@@ -115,7 +121,9 @@ async function processUpdate (message) {
     } else {
       const updateIndex = _.findIndex(user[userResource.propertyName], [userResource.relateKey, relateId])
       user[userResource.propertyName].splice(updateIndex, 1, _.omit(message.payload, 'resource'))
+      logger.info(`Updating ${user.id} and ${relateId}`)
       await helper.updateUser(message.payload.userId, user)
+      logger.info(`Updated ${user.id} and ${relateId}`)
     }
   } else if (_.includes(_.keys(organizationResources), resource)) {
     logger.info(`Processing org level resource: ${resource}`)
@@ -164,8 +172,7 @@ async function processDelete (message) {
     await client.delete({
       index: topResources[resource].index,
       type: topResources[resource].type,
-      id: message.payload.id,
-      refresh: 'true'
+      id: message.payload.id
     })
   } else if (_.includes(_.keys(userResources), resource)) {
     // process user resources such as userSkill, userAttribute...
