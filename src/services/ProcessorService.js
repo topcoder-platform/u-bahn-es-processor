@@ -89,6 +89,7 @@ processCreate.schema = {
 async function processUpdate (message) {
   const resource = message.payload.resource
   if (_.includes(_.keys(topResources), resource)) {
+    logger.info(`Processing top level resource: ${resource}`)
     // process the top resources such as user, skill...
     helper.validProperties(message.payload, ['id'])
     const client = await helper.getESClient()
@@ -99,9 +100,13 @@ async function processUpdate (message) {
   } else if (_.includes(_.keys(userResources), resource)) {
     // process user resources such as userSkill, userAttribute...
     const userResource = userResources[resource]
-    userResource.validate(message.payload)
-    const user = await helper.getUser(message.payload.userId)
     const relateId = message.payload[userResource.relateKey]
+    logger.info(`Processing user level resource: ${resource}:${relateId}`)
+    userResource.validate(message.payload)
+    logger.info(`Resource validated for ${relateId}`)
+    const user = await helper.getUser(message.payload.userId)
+    logger.info(`User fetched ${user.id} and ${relateId}`)
+    // const relateId = message.payload[userResource.relateKey]
 
     // check the resource exist
     if (!user[userResource.propertyName] || !_.some(user[userResource.propertyName], [userResource.relateKey, relateId])) {
@@ -113,6 +118,7 @@ async function processUpdate (message) {
       await helper.updateUser(message.payload.userId, user)
     }
   } else if (_.includes(_.keys(organizationResources), resource)) {
+    logger.info(`Processing org level resource: ${resource}`)
     // process org resources such as org skill providers
     const orgResource = organizationResources[resource]
     orgResource.validate(message.payload)
