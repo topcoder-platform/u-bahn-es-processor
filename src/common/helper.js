@@ -33,24 +33,22 @@ async function getESClient () {
   if (esClient) {
     return esClient
   }
-  const hosts = config.ES.HOST
+  const host = config.ES.HOST
   const apiVersion = config.ES.API_VERSION
 
   // AWS ES configuration is different from other providers
-  if (/.*amazonaws.*/.test(hosts)) {
-    esClient = new elasticsearch.Client({
-      apiVersion,
-      hosts,
-      connectionClass: require('http-aws-es'), // eslint-disable-line global-require
-      amazonES: {
-        region: config.ES.AWS_REGION,
-        credentials: new AWS.EnvironmentCredentials('AWS')
-      }
-    })
+  if (/.*amazonaws.*/.test(host)) {
+    try {
+      esClient = new elasticsearch.Client({
+        apiVersion,
+        host,
+        connectionClass: require('http-aws-es') // eslint-disable-line global-require
+      })
+    } catch (error) { console.log(error) }
   } else {
     esClient = new elasticsearch.Client({
       apiVersion,
-      hosts
+      host
     })
   }
   return esClient
@@ -91,8 +89,32 @@ async function updateUser (userId, body) {
     index: config.get('ES.USER_INDEX'),
     type: config.get('ES.USER_TYPE'),
     id: userId,
-    body: { doc: body },
-    refresh: 'true'
+    body: { doc: body }
+  })
+}
+
+/**
+ * Function to get org from es
+ * @param {String} organizationId
+ * @returns {Object} organization
+ */
+async function getOrg (organizationId) {
+  const client = await getESClient()
+  return client.getSource({ index: config.get('ES.ORGANIZATION_INDEX'), type: config.get('ES.ORGANIZATION_TYPE'), id: organizationId })
+}
+
+/**
+ * Function to update es organization
+ * @param {String} organizationId
+ * @param {Object} body
+ */
+async function updateOrg (organizationId, body) {
+  const client = await getESClient()
+  await client.update({
+    index: config.get('ES.ORGANIZATION_INDEX'),
+    type: config.get('ES.ORGANIZATION_TYPE'),
+    id: organizationId,
+    body: { doc: body }
   })
 }
 
@@ -114,5 +136,7 @@ module.exports = {
   validProperties,
   getUser,
   updateUser,
+  getOrg,
+  updateOrg,
   getErrorWithStatus
 }

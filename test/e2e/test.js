@@ -7,7 +7,7 @@ process.env.NODE_ENV = 'test'
 const _ = require('lodash')
 const config = require('config')
 const helper = require('../../src/common/helper')
-const { topResources, userResources } = require('../../src/common/constants')
+const { topResources, userResources, organizationResources } = require('../../src/common/constants')
 const request = require('superagent')
 const Kafka = require('no-kafka')
 const should = require('should')
@@ -284,7 +284,7 @@ describe('UBahn - Elasticsearch Data Processor E2E Test', () => {
       await sendMessage(message)
       await waitJob()
 
-      should.equal(_.last(infoLogs), `Ignore this message since resource is not in [${_.union(_.keys(topResources), _.keys(userResources))}]`)
+      should.equal(_.last(infoLogs), `Ignore this message since resource is not in [${_.union(_.keys(topResources), _.keys(userResources), _.keys(organizationResources))}]`)
     })
   }
 })
