@@ -57,7 +57,13 @@ let esClient = {
   },
 
   async getSource () {
-    return this.client.getSource(...arguments)
+    const release = await this.mutex.acquire()
+
+    try {
+      return this.client.getSource(...arguments)
+    } finally {
+      release()
+    }
   },
 
   indices: undefined
