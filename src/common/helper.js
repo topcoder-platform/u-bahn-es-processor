@@ -7,11 +7,61 @@ const config = require('config')
 const elasticsearch = require('elasticsearch')
 const _ = require('lodash')
 const Joi = require('@hapi/joi')
+const Mutex = require('async-mutex').Mutex
 
 AWS.config.region = config.ES.AWS_REGION
 
 // Elasticsearch client
-let esClient
+let esClient = {
+  mutex: new Mutex(),
+  client: null,
+
+  ctor (client) {
+    this.client = client
+    this.indices = {
+      exists: client.indices.exists.bind(client.indices),
+      putMapping: client.indices.putMapping.bind(client.indices),
+      create: client.indices.create.bind(client.indices),
+      delete: client.indices.delete.bind(client.indices)
+    }
+  },
+
+  async create () {
+    const release = await this.mutex.acquire()
+
+    try {
+      return this.client.create(...arguments)
+    } finally {
+      release()
+    }
+  },
+
+  async update () {
+    const release = await this.mutex.acquire()
+
+    try {
+      return this.client.update(...arguments)
+    } finally {
+      release()
+    }
+  },
+
+  async delete () {
+    const release = await this.mutex.acquire()
+
+    try {
+      return this.client.delete(...arguments)
+    } finally {
+      release()
+    }
+  },
+
+  async getSource () {
+    return this.client.getSource(...arguments)
+  },
+
+  indices: undefined
+}
 
 /**
  * Get Kafka options
@@ -30,7 +80,7 @@ function getKafkaOptions () {
  * @return {Object} Elasticsearch Client Instance
  */
 async function getESClient () {
-  if (esClient) {
+  if (esClient.client) {
     return esClient
   }
   const host = config.ES.HOST
@@ -39,17 +89,17 @@ async function getESClient () {
   // AWS ES configuration is different from other providers
   if (/.*amazonaws.*/.test(host)) {
     try {
-      esClient = new elasticsearch.Client({
+      esClient.ctor(new elasticsearch.Client({
         apiVersion,
         host,
         connectionClass: require('http-aws-es') // eslint-disable-line global-require
-      })
+      }))
     } catch (error) { console.log(error) }
   } else {
-    esClient = new elasticsearch.Client({
+    esClient.ctor(new elasticsearch.Client({
       apiVersion,
       host
-    })
+    }))
   }
   return esClient
 }

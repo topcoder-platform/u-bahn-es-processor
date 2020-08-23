@@ -3,7 +3,7 @@
  */
 
 module.exports = {
-  WAIT_TIME: 1500,
+  WAIT_TIME: 1500
   // ES: {
   //   ACHIEVEMENT_PROVIDER_INDEX: process.env.ACHIEVEMENT_PROVIDER_INDEX || 'achievement_provider_test',
   //   ATTRIBUTE_INDEX: process.env.ATTRIBUTE_INDEX || 'attribute_test',
