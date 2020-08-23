@@ -145,7 +145,8 @@ async function updateUser (userId, body) {
     index: config.get('ES.USER_INDEX'),
     type: config.get('ES.USER_TYPE'),
     id: userId,
-    body: { doc: body }
+    body: { doc: body },
+    refresh: 'true'
   })
 }
 
@@ -170,7 +171,8 @@ async function updateOrg (organizationId, body) {
     index: config.get('ES.ORGANIZATION_INDEX'),
     type: config.get('ES.ORGANIZATION_TYPE'),
     id: organizationId,
-    body: { doc: body }
+    body: { doc: body },
+    refresh: 'true'
   })
 }
 
