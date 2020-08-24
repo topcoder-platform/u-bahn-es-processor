@@ -66,6 +66,16 @@ let esClient = {
     }
   },
 
+  async get () {
+    const release = await this.mutex.acquire()
+
+    try {
+      return this.client.get(...arguments)
+    } finally {
+      release()
+    }
+  },
+
   indices: undefined
 }
 
@@ -127,26 +137,35 @@ function validProperties (payload, keys) {
 /**
  * Function to get user from es
  * @param {String} userId
+ * @param {Boolean} sourceOnly
  * @returns {Object} user
  */
-async function getUser (userId) {
+async function getUser (userId, sourceOnly = true) {
   const client = await getESClient()
-  return client.getSource({ index: config.get('ES.USER_INDEX'), type: config.get('ES.USER_TYPE'), id: userId })
+
+  if (sourceOnly) {
+    return client.getSource({ index: config.get('ES.USER_INDEX'), type: config.get('ES.USER_TYPE'), id: userId })
+  }
+
+  return client.get({ index: config.get('ES.USER_INDEX'), type: config.get('ES.USER_TYPE'), id: userId })
 }
 
 /**
  * Function to update es user
  * @param {String} userId
+ * @param {Number} seqNo
+ * @param {Number} primaryTerm
  * @param {Object} body
  */
-async function updateUser (userId, body) {
+async function updateUser (userId, body, seqNo, primaryTerm) {
   const client = await getESClient()
   await client.update({
     index: config.get('ES.USER_INDEX'),
     type: config.get('ES.USER_TYPE'),
     id: userId,
     body: { doc: body },
-    refresh: 'true'
+    if_seq_no: seqNo,
+    if_primary_term: primaryTerm
   })
 }
 

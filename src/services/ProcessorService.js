@@ -112,7 +112,10 @@ async function processUpdate (message) {
     logger.info(`Processing user level resource: ${resource}:${relateId}`)
     userResource.validate(message.payload)
     logger.info(`Resource validated for ${relateId}`)
-    const user = await helper.getUser(message.payload.userId)
+    let user = await helper.getUser(message.payload.userId, false)
+    const seqNo = user._seq_no
+    const primaryTerm = user._primary_term
+    user = user._source
     logger.info(`User fetched ${user.id} and ${relateId}`)
     // const relateId = message.payload[userResource.relateKey]
 
@@ -124,7 +127,7 @@ async function processUpdate (message) {
       const updateIndex = _.findIndex(user[userResource.propertyName], [userResource.relateKey, relateId])
       user[userResource.propertyName].splice(updateIndex, 1, _.omit(message.payload, 'resource'))
       logger.info(`Updating ${user.id} and ${relateId}`)
-      await helper.updateUser(message.payload.userId, user)
+      await helper.updateUser(message.payload.userId, user, seqNo, primaryTerm)
       logger.info(`Updated ${user.id} and ${relateId}`)
     }
   } else if (_.includes(_.keys(organizationResources), resource)) {
