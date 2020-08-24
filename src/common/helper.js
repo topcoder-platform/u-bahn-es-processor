@@ -7,11 +7,14 @@ const config = require('config')
 const elasticsearch = require('elasticsearch')
 const _ = require('lodash')
 const Joi = require('@hapi/joi')
+const { Mutex } = require('async-mutex')
 
 AWS.config.region = config.ES.AWS_REGION
 
 // Elasticsearch client
 let esClient
+// Mutex to ensure that only one elasticsearch action is carried out at any given time
+const esClientMutex = new Mutex()
 
 /**
  * Get Kafka options
@@ -51,6 +54,18 @@ async function getESClient () {
       host
     })
   }
+
+  // Patch the transport to enable mutex
+  esClient.transport.originalRequest = esClient.transport.request
+  esClient.transport.request = async (params) => {
+    const release = await esClientMutex.acquire()
+    try {
+      return await esClient.transport.originalRequest(params)
+    } finally {
+      release()
+    }
+  }
+
   return esClient
 }
 
