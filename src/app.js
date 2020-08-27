@@ -5,6 +5,7 @@
 global.Promise = require('bluebird')
 const config = require('config')
 const Kafka = require('no-kafka')
+const _ = require('lodash')
 const healthcheck = require('topcoder-healthcheck-dropin')
 const logger = require('./common/logger')
 const helper = require('./common/helper')
@@ -66,17 +67,17 @@ const dataHandler = (messageSet, topic, partition) => Promise.each(messageSet, a
     await consumer.commitOffset({ topic, partition, offset: m.offset })
     return
   }
-
+  const transactionId = _.uniqueId('transaction_')
   try {
     switch (topic) {
       case config.UBAHN_CREATE_TOPIC:
-        await ProcessorService.processCreate(messageJSON)
+        await ProcessorService.processCreate(messageJSON, transactionId)
         break
       case config.UBAHN_UPDATE_TOPIC:
-        await ProcessorService.processUpdate(messageJSON)
+        await ProcessorService.processUpdate(messageJSON, transactionId)
         break
       case config.UBAHN_DELETE_TOPIC:
-        await ProcessorService.processDelete(messageJSON)
+        await ProcessorService.processDelete(messageJSON, transactionId)
         break
     }
 
@@ -84,6 +85,7 @@ const dataHandler = (messageSet, topic, partition) => Promise.each(messageSet, a
   } catch (err) {
     logger.logFullError(err)
   } finally {
+    helper.checkEsMutexRelease(transactionId)
     logger.debug(`Commiting offset after processing message with count ${messageCount}`)
 
     // Commit offset regardless of error
