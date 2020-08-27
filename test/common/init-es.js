@@ -1,6 +1,7 @@
 /**
- * !OBSOLETE SCRIPT. Use the one from ubahn-api instead
- * !( https://github.com/topcoder-platform/u-bahn-api )
+ * ! OBSOLETE SCRIPT. NOT MAINTAINED.
+ * ! Use the one from ubahn-api instead
+ * ! ( https://github.com/topcoder-platform/u-bahn-api )
  */
 
 /**
