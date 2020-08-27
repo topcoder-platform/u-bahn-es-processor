@@ -8,7 +8,6 @@ const elasticsearch = require('elasticsearch')
 const _ = require('lodash')
 const Joi = require('@hapi/joi')
 const { Mutex } = require('async-mutex')
-const { default: Axios } = require('axios')
 
 AWS.config.region = config.ES.AWS_REGION
 
@@ -192,15 +191,6 @@ function checkEsMutexRelease (tId) {
   }
 }
 
-async function postToWebhook (data) {
-  try {
-    await Axios.post('https://webhook.site/249a740a-8671-4e35-a37c-321f795bff05', data)
-  } catch (error) {
-    console.log('Error posting to webhook')
-    console.log(error)
-  }
-}
-
 module.exports = {
   getKafkaOptions,
   getESClient,
@@ -210,6 +200,5 @@ module.exports = {
   getOrg,
   updateOrg,
   getErrorWithStatus,
-  checkEsMutexRelease,
-  postToWebhook
+  checkEsMutexRelease
 }
