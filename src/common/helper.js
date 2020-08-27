@@ -13,10 +13,8 @@ AWS.config.region = config.ES.AWS_REGION
 
 // Elasticsearch client
 let esClient
-let transactionId
 // Mutex to ensure that only one elasticsearch action is carried out at any given time
 const esClientMutex = new Mutex()
-const mutexReleaseMap = {}
 
 /**
  * Get Kafka options
@@ -60,24 +58,11 @@ async function getESClient () {
   // Patch the transport to enable mutex
   esClient.transport.originalRequest = esClient.transport.request
   esClient.transport.request = async (params) => {
-    const tId = _.get(params.query, 'transactionId')
-    params.query = _.omit(params.query, 'transactionId')
-    if (!tId || tId !== transactionId) {
-      const release = await esClientMutex.acquire()
-      mutexReleaseMap[tId || 'noTransaction'] = release
-      transactionId = tId
-    }
+    const release = await esClientMutex.acquire()
     try {
       return await esClient.transport.originalRequest(params)
     } finally {
-      if (params.method !== 'GET' || !tId) {
-        const release = mutexReleaseMap[tId || 'noTransaction']
-        delete mutexReleaseMap[tId || 'noTransaction']
-        transactionId = undefined
-        if (release) {
-          release()
-        }
-      }
+      release()
     }
   }
 
@@ -101,13 +86,17 @@ function validProperties (payload, keys) {
 /**
  * Function to get user from es
  * @param {String} userId
- * @param {String} transactionId
+ * @param {Boolean} sourceOnly
  * @returns {Object} user
  */
-async function getUser (userId, transactionId) {
+async function getUser (userId, sourceOnly = true) {
   const client = await getESClient()
-  const user = await client.get({ index: config.get('ES.USER_INDEX'), type: config.get('ES.USER_TYPE'), id: userId, transactionId })
-  return { seqNo: user._seq_no, primaryTerm: user._primary_term, user: user._source }
+
+  if (sourceOnly) {
+    return client.getSource({ index: config.get('ES.USER_INDEX'), type: config.get('ES.USER_TYPE'), id: userId })
+  }
+
+  return client.get({ index: config.get('ES.USER_INDEX'), type: config.get('ES.USER_TYPE'), id: userId })
 }
 
 /**
@@ -115,16 +104,14 @@ async function getUser (userId, transactionId) {
  * @param {String} userId
  * @param {Number} seqNo
  * @param {Number} primaryTerm
- * @param {String} transactionId
  * @param {Object} body
  */
-async function updateUser (userId, body, seqNo, primaryTerm, transactionId) {
+async function updateUser (userId, body, seqNo, primaryTerm) {
   const client = await getESClient()
   await client.update({
     index: config.get('ES.USER_INDEX'),
     type: config.get('ES.USER_TYPE'),
     id: userId,
-    transactionId,
     body: { doc: body },
     if_seq_no: seqNo,
     if_primary_term: primaryTerm
@@ -134,33 +121,26 @@ async function updateUser (userId, body, seqNo, primaryTerm, transactionId) {
 /**
  * Function to get org from es
  * @param {String} organizationId
- * @param {String} transactionId
  * @returns {Object} organization
  */
-async function getOrg (organizationId, transactionId) {
+async function getOrg (organizationId) {
   const client = await getESClient()
-  const org = await client.get({ index: config.get('ES.ORGANIZATION_INDEX'), type: config.get('ES.ORGANIZATION_TYPE'), id: organizationId, transactionId })
-  return { seqNo: org._seq_no, primaryTerm: org._primary_term, org: org._source }
+  return client.getSource({ index: config.get('ES.ORGANIZATION_INDEX'), type: config.get('ES.ORGANIZATION_TYPE'), id: organizationId })
 }
 
 /**
  * Function to update es organization
  * @param {String} organizationId
- * @param {Number} seqNo
- * @param {Number} primaryTerm
- * @param {String} transactionId
  * @param {Object} body
  */
-async function updateOrg (organizationId, body, seqNo, primaryTerm, transactionId) {
+async function updateOrg (organizationId, body) {
   const client = await getESClient()
   await client.update({
     index: config.get('ES.ORGANIZATION_INDEX'),
     type: config.get('ES.ORGANIZATION_TYPE'),
     id: organizationId,
-    transactionId,
     body: { doc: body },
-    if_seq_no: seqNo,
-    if_primary_term: primaryTerm
+    refresh: 'true'
   })
 }
 
@@ -176,21 +156,6 @@ function getErrorWithStatus (message, statusCode) {
   return error
 }
 
-/**
- * Ensure the esClient mutex is released
- * @param {String} tId transactionId
- */
-function checkEsMutexRelease (tId) {
-  if (tId === transactionId) {
-    const release = mutexReleaseMap[tId]
-    delete mutexReleaseMap[tId]
-    transactionId = undefined
-    if (release) {
-      release()
-    }
-  }
-}
-
 module.exports = {
   getKafkaOptions,
   getESClient,
@@ -199,6 +164,5 @@ module.exports = {
   updateUser,
   getOrg,
   updateOrg,
-  getErrorWithStatus,
-  checkEsMutexRelease
+  getErrorWithStatus
 }
