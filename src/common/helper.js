@@ -8,6 +8,7 @@ const elasticsearch = require('elasticsearch')
 const _ = require('lodash')
 const Joi = require('@hapi/joi')
 const { Mutex } = require('async-mutex')
+const logger = require('./logger')
 
 AWS.config.region = config.ES.AWS_REGION
 
@@ -63,9 +64,13 @@ async function getESClient () {
     const tId = _.get(params.query, 'transactionId')
     params.query = _.omit(params.query, 'transactionId')
     if (!tId || tId !== transactionId) {
+      logger.info(`${transactionId} is trying to acquire the mutex`)
       const release = await esClientMutex.acquire()
+      logger.info(`${transactionId} has acquired the mutex`)
       mutexReleaseMap[tId || 'noTransaction'] = release
       transactionId = tId
+    } else {
+      logger.info(`${transactionId} did not acquire any mutex`)
     }
     try {
       return await esClient.transport.originalRequest(params)
@@ -75,8 +80,12 @@ async function getESClient () {
         delete mutexReleaseMap[tId || 'noTransaction']
         transactionId = undefined
         if (release) {
+          logger.info(`${transactionId} is now releasing the mutex`)
           release()
+          logger.info(`${transactionId} has released the mutex`)
         }
+      } else {
+        logger.info(`${transactionId} did not release the mutex`)
       }
     }
   }
@@ -186,7 +195,11 @@ function checkEsMutexRelease (tId) {
     delete mutexReleaseMap[tId]
     transactionId = undefined
     if (release) {
+      logger.info(`${tId} is releasing the mutex`)
       release()
+      logger.info(`${tId} has released the mutex`)
+    } else {
+      logger.info(`${tId} has no mutex to release`)
     }
   }
 }
