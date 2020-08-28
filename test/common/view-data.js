@@ -8,24 +8,23 @@ const logger = require('../../src/common/logger')
 const helper = require('../../src/common/helper')
 const { topResources } = require('../../src/common/constants')
 
+let client
+
 if (process.argv.length < 4) {
   logger.error('Missing argument for Resource and Elasticsearch id.')
   process.exit()
 }
 
 const view = async (resource, id) => {
-  let { client, release } = await helper.getESClientWrapper()
-
-  try {
-    if (_.includes(_.keys(topResources), resource)) {
-      const ret = await client.getSource({ index: topResources[resource].index, type: topResources[resource].type, id })
-      logger.info('Elasticsearch data:')
-      logger.info(JSON.stringify(ret, null, 4))
-    } else {
-      logger.warn(`resource is invalid, it should in [${_.keys(topResources)}]`)
-    }
-  } finally {
-    release()
+  if (!client) {
+    client = await helper.getESClient()
+  }
+  if (_.includes(_.keys(topResources), resource)) {
+    const ret = await client.getSource({ index: topResources[resource].index, type: topResources[resource].type, id })
+    logger.info('Elasticsearch data:')
+    logger.info(JSON.stringify(ret, null, 4))
+  } else {
+    logger.warn(`resource is invalid, it should in [${_.keys(topResources)}]`)
   }
 }
 
