@@ -98,11 +98,12 @@ async function processUpdate (message, transactionId) {
     const client = await helper.getESClient()
     const { index, type } = topResources[resource]
     const id = message.payload.id
-    const source = await client.get({ index, type, id, transaction: true })
+    const source = await client.get({ index, type, id, transactionId })
     await client.update({
       index,
       type,
       id,
+      transactionId,
       body: {
         doc: _.assign(source._source, _.omit(message.payload, 'resource'))
       },
