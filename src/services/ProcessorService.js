@@ -11,6 +11,7 @@ const {
   userResources,
   organizationResources
 } = require('../common/constants')
+const config = require('config')
 
 /**
  * Process create entity message
@@ -27,8 +28,8 @@ async function processCreate (message, transactionId) {
       index: topResources[resource].index,
       type: topResources[resource].type,
       id: message.payload.id,
-      body: _.omit(message.payload, 'resource'),
-      refresh: 'true'
+      body: _.omit(message.payload, ['resource', 'originalTopic']),
+      refresh: 'wait_for'
     })
   } else if (_.includes(_.keys(userResources), resource)) {
     // process user resources such as userSkill, userAttribute...
@@ -45,7 +46,7 @@ async function processCreate (message, transactionId) {
       logger.error(`Can't create existed ${resource} with the ${userResource.relateKey}: ${relateId}, userId: ${message.payload.userId}`)
       throw helper.getErrorWithStatus('[version_conflict_engine_exception]', 409)
     } else {
-      user[userResource.propertyName].push(_.omit(message.payload, 'resource'))
+      user[userResource.propertyName].push(_.omit(message.payload, ['resource', 'originalTopic']))
       await helper.updateUser(message.payload.userId, user, seqNo, primaryTerm, transactionId)
     }
   } else if (_.includes(_.keys(organizationResources), resource)) {
@@ -63,7 +64,7 @@ async function processCreate (message, transactionId) {
       logger.error(`Can't create existing ${resource} with the ${orgResources.relateKey}: ${relateId}, organizationId: ${message.payload.organizationId}`)
       throw helper.getErrorWithStatus('[version_conflict_engine_exception]', 409)
     } else {
-      org[orgResources.propertyName].push(_.omit(message.payload, 'resource'))
+      org[orgResources.propertyName].push(_.omit(message.payload, ['resource', 'originalTopic']))
       await helper.updateOrg(message.payload.organizationId, org, seqNo, primaryTerm, transactionId)
     }
   } else {
@@ -78,7 +79,8 @@ processCreate.schema = {
     timestamp: Joi.date().required(),
     'mime-type': Joi.string().required(),
     payload: Joi.object().keys({
-      resource: Joi.string().required()
+      resource: Joi.string().required(),
+      originalTopic: Joi.string().required().valid(config.UBAHN_CREATE_TOPIC)
     }).required().unknown(true)
   }).required(),
   transactionId: Joi.string().required()
@@ -105,10 +107,11 @@ async function processUpdate (message, transactionId) {
       id,
       transactionId,
       body: {
-        doc: _.assign(source._source, _.omit(message.payload, 'resource'))
+        doc: _.assign(source._source, _.omit(message.payload, ['resource', 'originalTopic']))
       },
       if_seq_no: source._seq_no,
-      if_primary_term: source._primary_term
+      if_primary_term: source._primary_term,
+      refresh: 'wait_for'
     })
   } else if (_.includes(_.keys(userResources), resource)) {
     // process user resources such as userSkill, userAttribute...
@@ -127,7 +130,7 @@ async function processUpdate (message, transactionId) {
       throw helper.getErrorWithStatus('[resource_not_found_exception]', 404)
     } else {
       const updateIndex = _.findIndex(user[userResource.propertyName], [userResource.relateKey, relateId])
-      user[userResource.propertyName].splice(updateIndex, 1, _.omit(message.payload, 'resource'))
+      user[userResource.propertyName].splice(updateIndex, 1, _.omit(message.payload, ['resource', 'originalTopic']))
       logger.info(`Updating ${user.id} and ${relateId}`)
       await helper.updateUser(message.payload.userId, user, seqNo, primaryTerm, transactionId)
       logger.info(`Updated ${user.id} and ${relateId}`)
@@ -146,7 +149,7 @@ async function processUpdate (message, transactionId) {
       throw helper.getErrorWithStatus('[resource_not_found_exception]', 404)
     } else {
       const updateIndex = _.findIndex(org[orgResource.propertyName], [orgResource.relateKey, relateId])
-      org[orgResource.propertyName].splice(updateIndex, 1, _.omit(message.payload, 'resource'))
+      org[orgResource.propertyName].splice(updateIndex, 1, _.omit(message.payload, ['resource', 'originalTopic']))
       await helper.updateOrg(message.payload.organizationId, org, seqNo, primaryTerm, transactionId)
     }
   } else {
@@ -161,7 +164,8 @@ processUpdate.schema = {
     timestamp: Joi.date().required(),
     'mime-type': Joi.string().required(),
     payload: Joi.object().keys({
-      resource: Joi.string().required()
+      resource: Joi.string().required(),
+      originalTopic: Joi.string().required().valid(config.UBAHN_UPDATE_TOPIC)
     }).required().unknown(true)
   }).required(),
   transactionId: Joi.string().required()
@@ -182,7 +186,7 @@ async function processDelete (message, transactionId) {
       index: topResources[resource].index,
       type: topResources[resource].type,
       id: message.payload.id,
-      refresh: 'true'
+      refresh: 'wait_for'
     })
   } else if (_.includes(_.keys(userResources), resource)) {
     // process user resources such as userSkill, userAttribute...
@@ -226,7 +230,8 @@ processDelete.schema = {
     timestamp: Joi.date().required(),
     'mime-type': Joi.string().required(),
     payload: Joi.object().keys({
-      resource: Joi.string().required()
+      resource: Joi.string().required(),
+      originalTopic: Joi.string().required().valid(config.UBAHN_DELETE_TOPIC)
     }).required().unknown(true)
   }).required(),
   transactionId: Joi.string().required()

@@ -69,7 +69,7 @@ const dataHandler = (messageSet, topic, partition) => Promise.each(messageSet, a
   }
   const transactionId = _.uniqueId('transaction_')
   try {
-    switch (topic) {
+    switch (messageJSON.payload.originalTopic) {
       case config.UBAHN_CREATE_TOPIC:
         await ProcessorService.processCreate(messageJSON, transactionId)
         break
@@ -79,6 +79,8 @@ const dataHandler = (messageSet, topic, partition) => Promise.each(messageSet, a
       case config.UBAHN_DELETE_TOPIC:
         await ProcessorService.processDelete(messageJSON, transactionId)
         break
+      default:
+        throw new Error(`Unknown original topic: ${messageJSON.payload.originalTopic}`)
     }
 
     logger.debug(`Successfully processed message with count ${messageCount}`)
@@ -106,7 +108,8 @@ const check = () => {
   return connected
 }
 
-const topics = [config.UBAHN_CREATE_TOPIC, config.UBAHN_UPDATE_TOPIC, config.UBAHN_DELETE_TOPIC]
+// const topics = [config.UBAHN_CREATE_TOPIC, config.UBAHN_UPDATE_TOPIC, config.UBAHN_DELETE_TOPIC]
+const topics = [config.UBAHN_AGGREGATE_TOPIC]
 
 consumer
   .init([{

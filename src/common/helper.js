@@ -128,7 +128,8 @@ async function updateUser (userId, body, seqNo, primaryTerm, transactionId) {
     transactionId,
     body: { doc: body },
     if_seq_no: seqNo,
-    if_primary_term: primaryTerm
+    if_primary_term: primaryTerm,
+    refresh: 'wait_for'
   })
 }
 
@@ -161,7 +162,8 @@ async function updateOrg (organizationId, body, seqNo, primaryTerm, transactionI
     transactionId,
     body: { doc: body },
     if_seq_no: seqNo,
-    if_primary_term: primaryTerm
+    if_primary_term: primaryTerm,
+    refresh: 'wait_for'
   })
 }
 
