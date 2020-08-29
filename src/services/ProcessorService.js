@@ -27,7 +27,7 @@ async function processCreate (message) {
       type: topResources[resource].type,
       id: message.payload.id,
       body: _.omit(message.payload, 'resource'),
-      refresh: 'wait_for'
+      refresh: 'true'
     })
   } else if (_.includes(_.keys(userResources), resource)) {
     // process user resources such as userSkill, userAttribute...
@@ -102,8 +102,7 @@ async function processUpdate (message) {
       id,
       body: {
         doc: _.assign(source, _.omit(message.payload, 'resource'))
-      },
-      refresh: 'wait_for'
+      }
     })
   } else if (_.includes(_.keys(userResources), resource)) {
     // process user resources such as userSkill, userAttribute...
@@ -175,7 +174,7 @@ async function processDelete (message) {
       index: topResources[resource].index,
       type: topResources[resource].type,
       id: message.payload.id,
-      refresh: 'wait_for'
+      refresh: 'true'
     })
   } else if (_.includes(_.keys(userResources), resource)) {
     // process user resources such as userSkill, userAttribute...
