@@ -5,6 +5,7 @@
 global.Promise = require('bluebird')
 const config = require('config')
 const Kafka = require('no-kafka')
+const _ = require('lodash')
 const healthcheck = require('topcoder-healthcheck-dropin')
 const logger = require('./common/logger')
 const helper = require('./common/helper')
@@ -16,7 +17,20 @@ logger.info('Starting kafka consumer')
 // create consumer
 const consumer = new Kafka.GroupConsumer(helper.getKafkaOptions())
 
+let count = 0
 let mutex = new Mutex()
+
+async function getLatestCount () {
+  const release = await mutex.acquire()
+
+  try {
+    count = count + 1
+
+    return count
+  } finally {
+    release()
+  }
+}
 
 /*
  * Data handler linked with Kafka consumer
@@ -24,54 +38,58 @@ let mutex = new Mutex()
  * this function will be invoked
  */
 const dataHandler = (messageSet, topic, partition) => Promise.each(messageSet, async (m) => {
-  const release = await mutex.acquire()
   const message = m.message.value.toString('utf8')
   logger.info(`Handle Kafka event message; Topic: ${topic}; Partition: ${partition}; Offset: ${
     m.offset}; Message: ${message}.`)
   let messageJSON
+  let messageCount = await getLatestCount()
 
+  logger.debug(`Current message count: ${messageCount}`)
   try {
     messageJSON = JSON.parse(message)
   } catch (e) {
     logger.error('Invalid message JSON.')
     logger.logFullError(e)
 
+    logger.debug(`Commiting offset after processing message with count ${messageCount}`)
+
     // commit the message and ignore it
     await consumer.commitOffset({ topic, partition, offset: m.offset })
     return
-  } finally {
-    release()
   }
 
   if (messageJSON.topic !== topic) {
     logger.error(`The message topic ${messageJSON.topic} doesn't match the Kafka topic ${topic}.`)
 
+    logger.debug(`Commiting offset after processing message with count ${messageCount}`)
+
     // commit the message and ignore it
     await consumer.commitOffset({ topic, partition, offset: m.offset })
-    release()
     return
   }
-
+  const transactionId = _.uniqueId('transaction_')
   try {
     switch (topic) {
       case config.UBAHN_CREATE_TOPIC:
-        await ProcessorService.processCreate(messageJSON)
+        await ProcessorService.processCreate(messageJSON, transactionId)
         break
       case config.UBAHN_UPDATE_TOPIC:
-        await ProcessorService.processUpdate(messageJSON)
+        await ProcessorService.processUpdate(messageJSON, transactionId)
         break
       case config.UBAHN_DELETE_TOPIC:
-        await ProcessorService.processDelete(messageJSON)
+        await ProcessorService.processDelete(messageJSON, transactionId)
         break
     }
 
-    logger.debug('Successfully processed message')
+    logger.debug(`Successfully processed message with count ${messageCount}`)
   } catch (err) {
     logger.logFullError(err)
   } finally {
+    helper.checkEsMutexRelease(transactionId)
+    logger.debug(`Commiting offset after processing message with count ${messageCount}`)
+
     // Commit offset regardless of error
     await consumer.commitOffset({ topic, partition, offset: m.offset })
-    release()
   }
 })
 
