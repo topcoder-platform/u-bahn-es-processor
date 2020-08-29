@@ -1,28 +1,5 @@
 # Verification
 
-**NOTE** - For all kafka message below, update the topic to be the one set in config.UBAHN_AGGREGATE_TOPIC and inside the payload object, create a new attribute named `originalTopic` with the value of the original topic. Example:
-
-```
-{
-  "topic": "u-bahn.action.aggregate",
-  "originator": "u-bahn-api",
-  "timestamp": "2019-07-08T00:00:00.000Z",
-  "mime-type": "application/json",
-  "payload": {
-    "originalTopic": "u-bahn.action.create"
-    "resource": "user",
-    "id": "391a3656-9a01-47d4-8c6d-64b68c44f212",
-    "handle": "user"
-  }
-}
-```
-
-Additionally, you will be entering the messages into only one topic:
-
-```
-docker exec -it ubahn-data-processor-es_kafka /opt/kafka/bin/kafka-console-producer.sh --broker-list localhost:9092 --topic u-bahn.action.aggregate
-```
-
 1. start kafka server, start elasticsearch, initialize Elasticsearch, start processor app
 2. start kafka-console-producer to write messages to `u-bahn.action.create`
 topic:

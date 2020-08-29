@@ -11,7 +11,6 @@ const {
   userResources,
   organizationResources
 } = require('../common/constants')
-const config = require('config')
 
 /**
  * Process create entity message
@@ -27,7 +26,7 @@ async function processCreate (message) {
       index: topResources[resource].index,
       type: topResources[resource].type,
       id: message.payload.id,
-      body: _.omit(message.payload, ['resource', 'originalTopic']),
+      body: _.omit(message.payload, 'resource'),
       refresh: 'wait_for'
     })
   } else if (_.includes(_.keys(userResources), resource)) {
@@ -45,7 +44,7 @@ async function processCreate (message) {
       logger.error(`Can't create existed ${resource} with the ${userResource.relateKey}: ${relateId}, userId: ${message.payload.userId}`)
       throw helper.getErrorWithStatus('[version_conflict_engine_exception]', 409)
     } else {
-      user[userResource.propertyName].push(_.omit(message.payload, ['resource', 'originalTopic']))
+      user[userResource.propertyName].push(_.omit(message.payload, 'resource'))
       await helper.updateUser(message.payload.userId, user)
     }
   } else if (_.includes(_.keys(organizationResources), resource)) {
@@ -63,7 +62,7 @@ async function processCreate (message) {
       logger.error(`Can't create existing ${resource} with the ${orgResources.relateKey}: ${relateId}, organizationId: ${message.payload.organizationId}`)
       throw helper.getErrorWithStatus('[version_conflict_engine_exception]', 409)
     } else {
-      org[orgResources.propertyName].push(_.omit(message.payload, ['resource', 'originalTopic']))
+      org[orgResources.propertyName].push(_.omit(message.payload, 'resource'))
       await helper.updateOrg(message.payload.organizationId, org)
     }
   } else {
@@ -78,8 +77,7 @@ processCreate.schema = {
     timestamp: Joi.date().required(),
     'mime-type': Joi.string().required(),
     payload: Joi.object().keys({
-      resource: Joi.string().required(),
-      originalTopic: Joi.string().required().valid(config.UBAHN_CREATE_TOPIC)
+      resource: Joi.string().required()
     }).required().unknown(true)
   }).required()
 }
@@ -103,7 +101,7 @@ async function processUpdate (message) {
       type,
       id,
       body: {
-        doc: _.assign(source, _.omit(message.payload, ['resource', 'originalTopic']))
+        doc: _.assign(source, _.omit(message.payload, 'resource'))
       },
       refresh: 'wait_for'
     })
@@ -124,7 +122,7 @@ async function processUpdate (message) {
       throw helper.getErrorWithStatus('[resource_not_found_exception]', 404)
     } else {
       const updateIndex = _.findIndex(user[userResource.propertyName], [userResource.relateKey, relateId])
-      user[userResource.propertyName].splice(updateIndex, 1, _.omit(message.payload, ['resource', 'originalTopic']))
+      user[userResource.propertyName].splice(updateIndex, 1, _.omit(message.payload, 'resource'))
       logger.info(`Updating ${user.id} and ${relateId}`)
       await helper.updateUser(message.payload.userId, user)
       logger.info(`Updated ${user.id} and ${relateId}`)
@@ -143,7 +141,7 @@ async function processUpdate (message) {
       throw helper.getErrorWithStatus('[resource_not_found_exception]', 404)
     } else {
       const updateIndex = _.findIndex(org[orgResource.propertyName], [orgResource.relateKey, relateId])
-      org[orgResource.propertyName].splice(updateIndex, 1, _.omit(message.payload, ['resource', 'originalTopic']))
+      org[orgResource.propertyName].splice(updateIndex, 1, _.omit(message.payload, 'resource'))
       await helper.updateOrg(message.payload.organizationId, org)
     }
   } else {
@@ -158,8 +156,7 @@ processUpdate.schema = {
     timestamp: Joi.date().required(),
     'mime-type': Joi.string().required(),
     payload: Joi.object().keys({
-      resource: Joi.string().required(),
-      originalTopic: Joi.string().required().valid(config.UBAHN_UPDATE_TOPIC)
+      resource: Joi.string().required()
     }).required().unknown(true)
   }).required()
 }
@@ -222,8 +219,7 @@ processDelete.schema = {
     timestamp: Joi.date().required(),
     'mime-type': Joi.string().required(),
     payload: Joi.object().keys({
-      resource: Joi.string().required(),
-      originalTopic: Joi.string().required().valid(config.UBAHN_DELETE_TOPIC)
+      resource: Joi.string().required()
     }).required().unknown(true)
   }).required()
 }
