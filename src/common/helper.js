@@ -8,7 +8,6 @@ const elasticsearch = require('elasticsearch')
 const _ = require('lodash')
 const Joi = require('@hapi/joi')
 const { Mutex } = require('async-mutex')
-const logger = require('./logger')
 
 AWS.config.region = config.ES.AWS_REGION
 

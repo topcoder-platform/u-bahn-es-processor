@@ -28,6 +28,7 @@ async function processCreate (message, transactionId) {
       index: topResources[resource].index,
       type: topResources[resource].type,
       id: message.payload.id,
+      transactionId,
       body: _.omit(message.payload, ['resource', 'originalTopic']),
       refresh: 'wait_for'
     })
@@ -186,6 +187,7 @@ async function processDelete (message, transactionId) {
       index: topResources[resource].index,
       type: topResources[resource].type,
       id: message.payload.id,
+      transactionId,
       refresh: 'wait_for'
     })
   } else if (_.includes(_.keys(userResources), resource)) {
