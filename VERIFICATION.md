@@ -24,41 +24,38 @@ docker exec -it ubahn-data-processor-es_kafka /opt/kafka/bin/kafka-console-produ
 ```
 
 1. start kafka server, start elasticsearch, initialize Elasticsearch, start processor app
-2. start kafka-console-producer to write messages to `u-bahn.action.create`
-topic:
-  `docker exec -it ubahn-data-processor-es_kafka /opt/kafka/bin/kafka-console-producer.sh --broker-list localhost:9092 --topic u-bahn.action.create`
-3. write message:
-  `{"topic":"u-bahn.action.create","originator":"u-bahn-api","timestamp":"2019-07-08T00:00:00.000Z","mime-type":"application/json","payload":{"resource":"user","id":"391a3656-9a01-47d4-8c6d-64b68c44f212","handle":"user"}}`
+2. write message:
+  `{"topic":"u-bahn.action.aggregate","originator":"u-bahn-api","timestamp":"2019-07-08T00:00:00.000Z","mime-type":"application/json","payload":{"resource":"user","id":"391a3656-9a01-47d4-8c6d-64b68c44f212","handle":"user","originalTopic":"u-bahn.action.create"}}`
 4. Watch the app console, It will show message successfully handled.
 5. Run Command `npm run view-data user 391a3656-9a01-47d4-8c6d-64b68c44f212` to verify the elastic data.
 
 6. write message:
-  `{"topic":"u-bahn.action.create","originator":"u-bahn-api","timestamp":"2019-07-08T00:00:00.000Z","mime-type":"application/json","payload":{"resource":"achievement","userId":"391a3656-9a01-47d4-8c6d-64b68c44f212","achievementsProviderId":"c77326d8-ef16-4be0-b844-d5c384b7bb8b","name":"achievement","uri":"https://google.com","certifierId":"b8726ca1-557e-4502-8f9b-25044b9c123d","certifiedDate":"2019-07-08T00:00:00.000Z"}}`
+  `{"topic":"u-bahn.action.aggregate","originator":"u-bahn-api","timestamp":"2019-07-08T00:00:00.000Z","mime-type":"application/json","payload":{"resource":"achievement","userId":"391a3656-9a01-47d4-8c6d-64b68c44f212","achievementsProviderId":"c77326d8-ef16-4be0-b844-d5c384b7bb8b","name":"achievement","uri":"https://google.com","certifierId":"b8726ca1-557e-4502-8f9b-25044b9c123d","certifiedDate":"2019-07-08T00:00:00.000Z","originalTopic":"u-bahn.action.create"}}`
 7. Watch the app console, It will show message successfully handled.
 8. Run Command `npm run view-data user 391a3656-9a01-47d4-8c6d-64b68c44f212` to verify the elastic data.
 
 9. write message:
-  `{"topic":"u-bahn.action.create","originator":"u-bahn-api","timestamp":"2019-07-08T00:00:00.000Z","mime-type":"application/json","payload":{"resource":"achievementprovider","id":"7b4f98b1-5831-45fe-a71f-8454d11eb8e8","name":"achievementprovider"}}`
+  `{"topic":"u-bahn.action.aggregate","originator":"u-bahn-api","timestamp":"2019-07-08T00:00:00.000Z","mime-type":"application/json","payload":{"resource":"achievementprovider","id":"7b4f98b1-5831-45fe-a71f-8454d11eb8e8","name":"achievementprovider","originalTopic":"u-bahn.action.create"}}`
 10. Watch the app console, It will show message successfully handled.
 11. Run Command `npm run view-data achievementprovider 7b4f98b1-5831-45fe-a71f-8454d11eb8e8` to verify the elastic data.
 
 12. write message:
-  `{"topic":"u-bahn.action.create","originator":"u-bahn-api","timestamp":"2019-07-08T00:00:00.000Z","mime-type":"application/json","payload":{"resource":"attributegroup","id":"720c34f9-0fd4-46fd-9293-4a8cfdcd3e96","organizationId":"017733ad-4704-4c7e-ae60-36b3332731df","name":"attributegroup"}}`
+  `{"topic":"u-bahn.action.aggregate","originator":"u-bahn-api","timestamp":"2019-07-08T00:00:00.000Z","mime-type":"application/json","payload":{"resource":"attributegroup","id":"720c34f9-0fd4-46fd-9293-4a8cfdcd3e96","organizationId":"017733ad-4704-4c7e-ae60-36b3332731df","name":"attributegroup","originalTopic":"u-bahn.action.create"}}`
 13. Watch the app console, It will show message successfully handled.
 14. Run Command `npm run view-data attributegroup 720c34f9-0fd4-46fd-9293-4a8cfdcd3e96` to verify the elastic data.
 
 15. write message:
-  `{"topic":"u-bahn.action.create","originator":"u-bahn-api","timestamp":"2019-07-08T00:00:00.000Z","mime-type":"application/json","payload":{"resource":"externalprofile","userId":"391a3656-9a01-47d4-8c6d-64b68c44f212","organizationId":"e2aecf8b-532d-4625-b8e2-575110b9f944","uri":"https:google.com"}}`
+  `{"topic":"u-bahn.action.aggregate","originator":"u-bahn-api","timestamp":"2019-07-08T00:00:00.000Z","mime-type":"application/json","payload":{"resource":"externalprofile","userId":"391a3656-9a01-47d4-8c6d-64b68c44f212","organizationId":"e2aecf8b-532d-4625-b8e2-575110b9f944","uri":"https:google.com","originalTopic":"u-bahn.action.create"}}`
 16. Watch the app console, It will show message successfully handled.
 17. Run Command `npm run view-data user 391a3656-9a01-47d4-8c6d-64b68c44f212` to verify the elastic data.
 
 18. write message:
-  `{"topic":"u-bahn.action.create","originator":"u-bahn-api","timestamp":"2019-07-08T00:00:00.000Z","mime-type":"application/json","payload":{"resource":"organization","id":"603d4264-cdb0-47f1-914e-f053abc60422","name":"organization"}}`
+  `{"topic":"u-bahn.action.aggregate","originator":"u-bahn-api","timestamp":"2019-07-08T00:00:00.000Z","mime-type":"application/json","payload":{"resource":"organization","id":"603d4264-cdb0-47f1-914e-f053abc60422","name":"organization","originalTopic":"u-bahn.action.create"}}`
 19. Watch the app console, It will show message successfully handled.
 20. Run Command `npm run view-data organization 603d4264-cdb0-47f1-914e-f053abc60422` to verify the elastic data.
 
 21. write message:
-  `{"topic":"u-bahn.action.create","originator":"u-bahn-api","timestamp":"2019-07-08T00:00:00.000Z","mime-type":"application/json","payload":{"resource":"role","id":"188446f1-02dc-4fc7-b74e-ab7ea3033a57","name":"role"}}`
+  `{"topic":"u-bahn.action.aggregate","originator":"u-bahn-api","timestamp":"2019-07-08T00:00:00.000Z","mime-type":"application/json","payload":{"resource":"role","id":"188446f1-02dc-4fc7-b74e-ab7ea3033a57","name":"role","originalTopic":"u-bahn.action.create"}}`
 22. Watch the app console, It will show message successfully handled.
 23. Run Command `npm run view-data role 188446f1-02dc-4fc7-b74e-ab7ea3033a57` to verify the elastic data.
 
@@ -89,17 +86,18 @@ topic:
 
 39. Repeat step 3 again and you will see error message in app console indicate conflict error.
 
-40. start kafka-console-producer to write messages to `u-bahn.action.update`
-topic:
-  `docker exec -it ubahn-data-processor-es_kafka /opt/kafka/bin/kafka-console-producer.sh --broker-list localhost:9092 --topic u-bahn.action.update`
 
+
+
+
+40. Now, let's perform the update operations and verify.
 41. write message to update the user:
-  `{"topic":"u-bahn.action.update","originator":"u-bahn-api","timestamp":"2019-07-08T00:00:00.000Z","mime-type":"application/json","payload":{"resource":"user","id":"391a3656-9a01-47d4-8c6d-64b68c44f212","handle":"update_user"}}`
+  `{"topic":"u-bahn.action.aggregate","originator":"u-bahn-api","timestamp":"2019-07-08T00:00:00.000Z","mime-type":"application/json","payload":{"resource":"user","id":"391a3656-9a01-47d4-8c6d-64b68c44f212","handle":"update_user","originalTopic":"u-bahn.action.update"}}`
 42. Watch the app console, It will show message successfully handled.
 43. Run Command `npm run view-data user 391a3656-9a01-47d4-8c6d-64b68c44f212` to verify the elastic data has been updated.
 
 44. write message to update the achievement:
-  `{"topic":"u-bahn.action.update","originator":"u-bahn-api","timestamp":"2019-07-08T00:00:00.000Z","mime-type":"application/json","payload":{"resource":"achievement","userId":"391a3656-9a01-47d4-8c6d-64b68c44f212","achievementsProviderId":"c77326d8-ef16-4be0-b844-d5c384b7bb8b","name":"update_name","uri":"https://facebook.com"}}`
+  `{"topic":"u-bahn.action.aggregate","originator":"u-bahn-api","timestamp":"2019-07-08T00:00:00.000Z","mime-type":"application/json","payload":{"resource":"achievement","userId":"391a3656-9a01-47d4-8c6d-64b68c44f212","achievementsProviderId":"c77326d8-ef16-4be0-b844-d5c384b7bb8b","name":"update_name","uri":"https://facebook.com","originalTopic":"u-bahn.action.update"}}`
 45. Watch the app console, It will show message successfully handled.
 46. Run Command `npm run view-data user 391a3656-9a01-47d4-8c6d-64b68c44f212` to verify the elastic data has been updated.
 
@@ -211,3 +209,48 @@ topic:
   `{"topic":"u-bahn.action.delete","originator":"u-bahn-api","timestamp":"2019-07-08T00:00:00.000Z","mime-type":"application/json","payload":{"resource":"user","id":"391a3656-9a01-47d4-8c6d-64b68c44f212"}}`
 109. Watch the app console, It will show message successfully handled.
 110. Run Command `npm run view-data user 391a3656-9a01-47d4-8c6d-64b68c44f212` to verify the elastic data has been deleted.
+
+
+# Verification (with groups)
+
+1. start kafka server, start elasticsearch, initialize Elasticsearch, start processor app
+2. start kafka-console-producer to write messages to `u-bahn.action.aggregate`
+topic:
+  `docker exec -it ubahn-data-processor-es_kafka /opt/kafka/bin/kafka-console-producer.sh --broker-list localhost:9092 --topic u-bahn.action.create`
+3. write message:
+  `{"topic":"u-bahn.action.aggregate","originator":"u-bahn-api","timestamp":"2019-07-08T00:00:00.000Z","mime-type":"application/json","payload":{"resource":"user","id":"391a3656-9a01-47d4-8c6d-64b68c44f212","handle":"user","originalTopic":"u-bahn.action.aggregate"}}`
+4. Watch the app console, It will show message successfully handled.
+5. Run Command `npm run view-data user 391a3656-9a01-47d4-8c6d-64b68c44f212` to verify the elastic data.
+
+6. start kafka-console-producer to write messages to `groups.notification.member.add`
+topic:
+  `docker exec -it ubahn-data-processor-es_kafka /opt/kafka/bin/kafka-console-producer.sh --broker-list localhost:9092 --topic groups.notification.member.add`
+7. write message:
+  `{"topic":"groups.notification.member.add","originator":"u-bahn-api","timestamp":"2019-07-08T00:00:00.000Z","mime-type":"application/json","payload":{"id":"c2f302cf-759a-4847-8acd-843e258359db","groupId":"036cc9c1-189a-4cf6-853b-0f5bc9b4ce75","oldId":"20000309","name":"House Stark","createdAt":"2020-09-11T13:14:54.108Z","createdBy":"8547899","universalUID":"391a3656-9a01-47d4-8c6d-64b68c44f212","membershipType":"user"}}`
+8. Watch the app console, It will show message successfully handled.
+9. Run Command `npm run view-data user 391a3656-9a01-47d4-8c6d-64b68c44f212` to verify the elastic data.
+
+
+10. Repeat again and you will see error message in app console indicate conflict error.
+  write message:
+  `{"topic":"groups.notification.member.add","originator":"u-bahn-api","timestamp":"2019-07-08T00:00:00.000Z","mime-type":"application/json","payload":{"id":"c2f302cf-759a-4847-8acd-843e258359db","groupId":"036cc9c1-189a-4cf6-853b-0f5bc9b4ce75","oldId":"20000309","name":"House Stark","createdAt":"2020-09-11T13:14:54.108Z","createdBy":"8547899","universalUID":"391a3656-9a01-47d4-8c6d-64b68c44f212","membershipType":"user"}}`
+
+11. start kafka-console-producer to write messages to `groups.notification.member.delete`
+topic:
+  `docker exec -it ubahn-data-processor-es_kafka /opt/kafka/bin/kafka-console-producer.sh --broker-list localhost:9092 --topic groups.notification.member.delete`
+12. write message to remove the groups user:
+  `{"topic":"groups.notification.member.delete","originator":"u-bahn-api","timestamp":"2019-07-08T00:00:00.000Z","mime-type":"application/json","payload":{"groupId":"036cc9c1-189a-4cf6-853b-0f5bc9b4ce75","name":".NET Taas Project","oldId":"20000335","memberId":"00000000","universalUID":"391a3656-9a01-47d4-8c6d-64b68c44f212"}}`
+13. Watch the app console, It will show message successfully handled.
+14. Run Command `npm run view-data user 391a3656-9a01-47d4-8c6d-64b68c44f212` to verify the elastic data
+
+15. Repeat again and you will see error message in app console indicate not found error.
+  write message:
+  `{"topic":"groups.notification.member.delete","originator":"u-bahn-api","timestamp":"2019-07-08T00:00:00.000Z","mime-type":"application/json","payload":{"groupId":"036cc9c1-189a-4cf6-853b-0f5bc9b4ce75","name":".NET Taas Project","oldId":"20000335","memberId":"00000000","universalUID":"391a3656-9a01-47d4-8c6d-64b68c44f212"}}`
+
+16. start kafka-console-producer to write messages to `u-bahn.action.delete`
+topic:
+  `docker exec -it ubahn-data-processor-es_kafka /opt/kafka/bin/kafka-console-producer.sh --broker-list localhost:9092 --topic u-bahn.action.delete`
+17. write message to delete the user:
+  `{"topic":"u-bahn.action.delete","originator":"u-bahn-api","timestamp":"2019-07-08T00:00:00.000Z","mime-type":"application/json","payload":{"resource":"user","id":"391a3656-9a01-47d4-8c6d-64b68c44f212"}}`
+18. Watch the app console, It will show message successfully handled.
+19. Run Command `npm run view-data user 391a3656-9a01-47d4-8c6d-64b68c44f212` to verify the elastic data has been deleted.
