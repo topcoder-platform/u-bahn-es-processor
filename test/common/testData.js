@@ -358,7 +358,7 @@ module.exports = {
         'mime-type': 'application/json',
         payload: {
           resource: 'achievement',
-          userId: 'A91a3656-9a01-47d4-8c6d-64b68c44f212',
+          userId: '391a3656-9a01-47d4-8c6d-64b68c44f212',
           achievementsProviderId: 'A77326d8-ef16-4be0-b844-d5c384b7bb8b',
           name: 'update_name',
           uri: 'https://facebook.com'
@@ -394,7 +394,7 @@ module.exports = {
         'mime-type': 'application/json',
         payload: {
           resource: 'externalprofile',
-          userId: 'A91a3656-9a01-47d4-8c6d-64b68c44f212',
+          userId: '391a3656-9a01-47d4-8c6d-64b68c44f212',
           organizationId: 'A2aecf8b-532d-4625-b8e2-575110b9f944',
           uri: 'https://facebook.com'
         }
@@ -609,5 +609,36 @@ module.exports = {
         }
       }
     ]
+  },
+  groupsTopics: {
+    addData: {
+      topic: 'groups.notification.member.add',
+      originator: 'u-bahn-api',
+      timestamp: '2019-07-08T00:00:00.000Z',
+      'mime-type': 'application/json',
+      payload: {
+        'id': 'c2f302cf-759a-4847-8acd-843e258359db',
+        'groupId': '036cc9c1-189a-4cf6-853b-0f5bc9b4ce75',
+        'oldId': '20000309',
+        'name': 'House Stark',
+        'createdAt': '2020-09-11T13:14:54.108Z',
+        'createdBy': '8547899',
+        'universalUID': '391a3656-9a01-47d4-8c6d-64b68c44f212',
+        'membershipType': 'user'
+      }
+    },
+    deleteData: {
+      topic: 'groups.notification.member.delete',
+      originator: 'u-bahn-api',
+      timestamp: '2019-07-08T00:00:00.000Z',
+      'mime-type': 'application/json',
+      payload: {
+        'groupId': '036cc9c1-189a-4cf6-853b-0f5bc9b4ce75',
+        'name': '.NET Taas Project',
+        'oldId': '20000335',
+        'memberId': '00000000',
+        'universalUID': '391a3656-9a01-47d4-8c6d-64b68c44f212'
+      }
+    }
   }
 }

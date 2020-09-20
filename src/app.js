@@ -9,6 +9,7 @@ const healthcheck = require('topcoder-healthcheck-dropin')
 const logger = require('./common/logger')
 const helper = require('./common/helper')
 const ProcessorService = require('./services/ProcessorService')
+const GroupsProcessorService = require('./services/GroupsProcessorService')
 const Mutex = require('async-mutex').Mutex
 
 // Start kafka consumer
@@ -78,6 +79,12 @@ const dataHandler = (messageSet, topic, partition) => Promise.each(messageSet, a
       case config.UBAHN_DELETE_TOPIC:
         await ProcessorService.processDelete(messageJSON)
         break
+      case config.GROUPS_MEMBER_ADD_TOPIC:
+        await GroupsProcessorService.processMemberAdd(messageJSON)
+        break
+      case config.GROUPS_MEMBER_DELETE_TOPIC:
+        await GroupsProcessorService.processMemberDelete(messageJSON)
+        break
     }
 
     logger.debug(`Successfully processed message with count ${messageCount}`)
@@ -104,7 +111,7 @@ const check = () => {
   return connected
 }
 
-const topics = [config.UBAHN_CREATE_TOPIC, config.UBAHN_UPDATE_TOPIC, config.UBAHN_DELETE_TOPIC]
+const topics = [config.UBAHN_CREATE_TOPIC, config.UBAHN_UPDATE_TOPIC, config.UBAHN_DELETE_TOPIC, config.GROUPS_MEMBER_ADD_TOPIC, config.GROUPS_MEMBER_DELETE_TOPIC]
 
 consumer
   .init([{

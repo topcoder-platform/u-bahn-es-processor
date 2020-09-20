@@ -9,8 +9,9 @@ const should = require('should')
 const logger = require('../../src/common/logger')
 const { topResources, userResources, organizationResources } = require('../../src/common/constants')
 const service = require('../../src/services/ProcessorService')
-const { fields, testTopics } = require('../common/testData')
-const { getESRecord } = require('../common/testHelper')
+const groupsProcessorService = require('../../src/services/GroupsProcessorService')
+const { fields, testTopics, groupsTopics } = require('../common/testData')
+const { getESRecord, getESGroupRecord } = require('../common/testHelper')
 
 describe('UBahn - Elasticsearch Data Processor Unit Test', () => {
   let infoLogs = []
@@ -177,4 +178,58 @@ describe('UBahn - Elasticsearch Data Processor Unit Test', () => {
       should.equal(_.last(infoLogs), `Ignore this message since resource is not in [${_.union(_.keys(topResources), _.keys(userResources), _.keys(organizationResources))}]`)
     })
   }
+
+  describe('UBahn - Elasticsearch Groups Processor Unit Test', () => {
+    before(async () => {
+      await service.processCreate(testTopics.Create[0])
+    })
+
+    after(async () => {
+      await service.processDelete(testTopics.Delete[11])
+    })
+
+    it(`test process add groups member message success`, async () => {
+      const message = groupsTopics.addData.payload
+      await groupsProcessorService.processMemberAdd(groupsTopics.addData)
+      const ret = await getESGroupRecord(message.universalUID, message.groupId)
+      const { groupId, name: groupName } = message
+      should.deepEqual(ret, { groupId, groupName })
+    })
+
+    it(`test process add groups member message with duplicate id`, async () => {
+      try {
+        await groupsProcessorService.processMemberAdd(groupsTopics.addData)
+        throw new Error('should not throw error here')
+      } catch (e) {
+        should.equal(e.statusCode, 409)
+      }
+    })
+
+    it(`test process add groups member message with ignore membershipType`, async () => {
+      const message = _.cloneDeep(groupsTopics.addData)
+      message.payload.membershipType = 'ignore'
+      await groupsProcessorService.processMemberAdd(message)
+      should.equal(_.last(infoLogs), `Ignore this groups member add message since membershipType is not 'user'`)
+    })
+
+    it(`test process remove groups member message success`, async () => {
+      const message = groupsTopics.deleteData.payload
+      await groupsProcessorService.processMemberDelete(groupsTopics.deleteData)
+      try {
+        await getESGroupRecord(message.universalUID, message.groupId)
+        throw new Error('should not throw error here')
+      } catch (e) {
+        should.equal(e.statusCode, 404)
+      }
+    })
+
+    it(`test process remove groups member message with user not exist in group`, async () => {
+      try {
+        await groupsProcessorService.processMemberDelete(groupsTopics.deleteData)
+        throw new Error('should not throw error here')
+      } catch (e) {
+        should.equal(e.statusCode, 404)
+      }
+    })
+  })
 })

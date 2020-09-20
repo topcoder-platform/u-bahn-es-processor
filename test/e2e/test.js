@@ -12,9 +12,9 @@ const request = require('superagent')
 const Kafka = require('no-kafka')
 const should = require('should')
 const logger = require('../../src/common/logger')
-const { fields, testTopics } = require('../common/testData')
+const { fields, testTopics, groupsTopics } = require('../common/testData')
 const { init, clearES } = require('../common/init-es')
-const { getESRecord } = require('../common/testHelper')
+const { getESRecord, getESGroupRecord } = require('../common/testHelper')
 
 describe('UBahn - Elasticsearch Data Processor E2E Test', () => {
   let app
@@ -57,7 +57,7 @@ describe('UBahn - Elasticsearch Data Processor E2E Test', () => {
     // remove all not processed messages
     const consumer = new Kafka.GroupConsumer(helper.getKafkaOptions())
     await consumer.init([{
-      subscriptions: [config.UBAHN_CREATE_TOPIC, config.UBAHN_UPDATE_TOPIC, config.UBAHN_DELETE_TOPIC],
+      subscriptions: [config.UBAHN_CREATE_TOPIC, config.UBAHN_UPDATE_TOPIC, config.UBAHN_DELETE_TOPIC, config.GROUPS_MEMBER_ADD_TOPIC, config.GROUPS_MEMBER_DELETE_TOPIC],
       handler: (messageSet, topic, partition) => Promise.each(messageSet,
         (m) => consumer.commitOffset({ topic, partition, offset: m.offset }))
     }])
@@ -287,4 +287,51 @@ describe('UBahn - Elasticsearch Data Processor E2E Test', () => {
       should.equal(_.last(infoLogs), `Ignore this message since resource is not in [${_.union(_.keys(topResources), _.keys(userResources), _.keys(organizationResources))}]`)
     })
   }
+
+  describe('UBahn - Elasticsearch Groups Processor E2E Test', () => {
+    before(async () => {
+      await sendMessage(testTopics.Create[0])
+      await waitJob()
+      await sleep(1000)
+    })
+
+    after(async () => {
+      await sendMessage(testTopics.Delete[11])
+      await waitJob()
+    })
+
+    it(`test process add groups member message success`, async () => {
+      const message = groupsTopics.addData.payload
+      await sendMessage(groupsTopics.addData)
+      await waitJob()
+      const ret = await getESGroupRecord(message.universalUID, message.groupId)
+      const { groupId, name: groupName } = message
+      should.deepEqual(ret, { groupId, groupName })
+    })
+
+    it(`test process add groups member message with duplicate id`, async () => {
+      await sendMessage(groupsTopics.addData)
+      await waitJob()
+      assertErrorMessage('[version_conflict_engine_exception]')
+    })
+
+    it(`test process add groups member message with ignore membershipType`, async () => {
+      const message = _.cloneDeep(groupsTopics.addData)
+      message.payload.membershipType = 'ignore'
+      await sendMessage(message)
+      await waitJob()
+      should.equal(_.last(infoLogs), `Ignore this groups member add message since membershipType is not 'user'`)
+    })
+
+    it(`test process remove groups member message success`, async () => {
+      await sendMessage(groupsTopics.deleteData)
+      await waitJob()
+    })
+
+    it(`test process remove groups member message with user not exist in group`, async () => {
+      await sendMessage(groupsTopics.deleteData)
+      await waitJob()
+      assertErrorMessage('[resource_not_found_exception]')
+    })
+  })
 })

@@ -17,6 +17,9 @@ module.exports = {
   UBAHN_CREATE_TOPIC: process.env.UBAHN_CREATE_TOPIC || 'u-bahn.action.create',
   UBAHN_UPDATE_TOPIC: process.env.UBAHN_UPDATE_TOPIC || 'u-bahn.action.update',
   UBAHN_DELETE_TOPIC: process.env.UBAHN_DELETE_TOPIC || 'u-bahn.action.delete',
+  GROUPS_MEMBER_ADD_TOPIC: process.env.GROUPS_MEMBER_ADD_TOPIC || 'groups.notification.member.add',
+  GROUPS_MEMBER_DELETE_TOPIC: process.env.GROUPS_MEMBER_DELETE_TOPIC || 'groups.notification.member.delete',
+  GROUPS_MEMBERSHIP_TYPE: process.env.GROUPS_MEMBERSHIP_TYPE || 'user',
 
   ES: {
     HOST: process.env.ES_HOST || 'localhost:9200',
@@ -44,6 +47,7 @@ module.exports = {
     USER_ATTRIBUTE_PROPERTY_NAME: process.env.USER_ATTRIBUTE_PROPERTY_NAME || 'attributes',
     USER_ROLE_PROPERTY_NAME: process.env.USER_ROLE_PROPERTY_NAME || 'roles',
     USER_SKILL_PROPERTY_NAME: process.env.USER_SKILL_PROPERTY_NAME || 'skills',
+    USER_GROUP_PROPERTY_NAME: process.env.USER_GROUP_PROPERTY_NAME || 'groups',
 
     ORGANIZATION_SKILLPROVIDER_PROPERTY_NAME: process.env.ORGANIZATION_SKILLPROVIDER_PROPERTY_NAME || 'skillProviders'
   }
