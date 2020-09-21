@@ -197,7 +197,7 @@ describe('UBahn - Elasticsearch Data Processor Unit Test', () => {
       await groupsProcessorService.processMemberAdd(groupsTopics.addData, 'transaction_11111')
       const ret = await getESGroupRecord(message.universalUID, message.groupId)
       const { groupId, name: groupName } = message
-      should.deepEqual(ret, { groupId, groupName })
+      should.deepEqual(ret, { id: groupId, name: groupName })
     })
 
     it(`test process add groups member message with duplicate id`, async () => {

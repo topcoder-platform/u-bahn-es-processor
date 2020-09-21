@@ -310,7 +310,7 @@ describe('UBahn - Elasticsearch Data Processor E2E Test', () => {
       await sleep(1000)
       const ret = await getESGroupRecord(message.universalUID, message.groupId)
       const { groupId, name: groupName } = message
-      should.deepEqual(ret, { groupId, groupName })
+      should.deepEqual(ret, { id: groupId, name: groupName })
     })
 
     it(`test process add groups member message with duplicate id`, async () => {

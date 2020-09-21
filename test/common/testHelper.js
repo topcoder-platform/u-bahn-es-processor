@@ -52,12 +52,12 @@ async function getESRecord (payload) {
 async function getESGroupRecord (userId, groupId) {
   const propertyName = config.get('ES.USER_GROUP_PROPERTY_NAME')
   const { user } = await helper.getUser(userId)
-  if (!user || !user[propertyName] || !_.some(user[propertyName], { groupId })) {
+  if (!user || !user[propertyName] || !_.some(user[propertyName], { id: groupId })) {
     const err = Error('[resource_not_found_exception]')
     err.statusCode = 404
     throw err
   }
-  return _.find(user[propertyName], { groupId })
+  return _.find(user[propertyName], { id: groupId })
 }
 
 module.exports = {

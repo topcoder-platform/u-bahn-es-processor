@@ -22,11 +22,11 @@ async function processMemberAdd (message, transactionId) {
       user[propertyName] = []
     }
     // check the group member does not exist
-    if (_.some(user[propertyName], { groupId })) {
+    if (_.some(user[propertyName], { id: groupId })) {
       logger.error(`userId: ${userId} is already a member of group with the groupId ${groupId}`)
       throw helper.getErrorWithStatus('[version_conflict_engine_exception]', 409)
     } else {
-      user[propertyName].push({ groupId, groupName })
+      user[propertyName].push({ id: groupId, name: groupName })
       await helper.updateUser(userId, user, seqNo, primaryTerm, transactionId)
     }
   } else {
@@ -61,11 +61,11 @@ async function processMemberDelete (message, transactionId) {
   const { seqNo, primaryTerm, user } = await helper.getUser(userId, transactionId)
 
   // check the group member exist
-  if (!user[propertyName] || !_.some(user[propertyName], { groupId })) {
+  if (!user[propertyName] || !_.some(user[propertyName], { id: groupId })) {
     logger.error(`The user: ${userId} not exist in group: ${groupId}`)
     throw helper.getErrorWithStatus('[resource_not_found_exception]', 404)
   } else {
-    _.remove(user[propertyName], { groupId })
+    _.remove(user[propertyName], { id: groupId })
     await helper.updateUser(userId, user, seqNo, primaryTerm, transactionId)
   }
 }
