@@ -18,7 +18,7 @@ prepare(function (done) {
     .post(uri => uri.includes('_create'))
     .query(true)
     .reply((uri, body) => {
-      const id = _.nth(_.split(uri, '/'), -2)
+      const id = _.last(_.split(uri, '/')).split('?')[0]
       if (content[id]) {
         return [409]
       } else {
@@ -29,7 +29,7 @@ prepare(function (done) {
     .post(uri => uri.includes('_update'))
     .query(true)
     .reply((uri, body) => {
-      const id = _.nth(_.split(uri, '/'), -2)
+      const id = _.last(_.split(uri, '/')).split('?')[0]
       if (content[id]) {
         content[id] = body.doc
         return [200]
@@ -51,9 +51,19 @@ prepare(function (done) {
     .get(uri => uri.includes('_source'))
     .query(true)
     .reply(uri => {
-      const id = _.nth(_.split(uri, '/'), -2)
+      const id = _.last(_.split(uri, '/')).split('?')[0]
       if (content[id]) {
         return [200, content[id]]
+      } else {
+        return [404]
+      }
+    })
+    .get(uri => uri.includes('_doc'))
+    .query(true)
+    .reply(uri => {
+      const id = _.last(_.split(uri, '/')).split('?')[0]
+      if (content[id]) {
+        return [200, { '_source': content[id] }]
       } else {
         return [404]
       }
