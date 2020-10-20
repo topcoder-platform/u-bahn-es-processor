@@ -23,9 +23,8 @@ module.exports = {
   GROUPS_MEMBERSHIP_TYPE: process.env.GROUPS_MEMBERSHIP_TYPE || 'user',
 
   ES: {
-    HOST: process.env.ES_HOST || 'localhost:9200',
+    HOST: process.env.ES_HOST || 'http://localhost:9200',
     AWS_REGION: process.env.AWS_REGION || 'us-east-1', // AWS Region to be used if we use AWS ES
-    API_VERSION: process.env.ES_API_VERSION || '7.4',
     ACHIEVEMENT_PROVIDER_INDEX: process.env.ACHIEVEMENT_PROVIDER_INDEX || 'achievement_provider',
     ACHIEVEMENT_PROVIDER_TYPE: process.env.ACHIEVEMENT_PROVIDER_TYPE || '_doc',
     ATTRIBUTE_INDEX: process.env.ATTRIBUTE_INDEX || 'attribute',
@@ -50,6 +49,8 @@ module.exports = {
     USER_SKILL_PROPERTY_NAME: process.env.USER_SKILL_PROPERTY_NAME || 'skills',
     USER_GROUP_PROPERTY_NAME: process.env.USER_GROUP_PROPERTY_NAME || 'groups',
 
-    ORGANIZATION_SKILLPROVIDER_PROPERTY_NAME: process.env.ORGANIZATION_SKILLPROVIDER_PROPERTY_NAME || 'skillProviders'
+    ORGANIZATION_SKILLPROVIDER_PROPERTY_NAME: process.env.ORGANIZATION_SKILLPROVIDER_PROPERTY_NAME || 'skillProviders',
+
+    ENRICH_USER_PIPELINE_NAME: process.env.ENRICH_USER_PIPELINE_NAME || 'enrich_user'
   }
 }

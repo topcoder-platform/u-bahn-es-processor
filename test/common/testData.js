@@ -230,6 +230,18 @@ module.exports = {
           certifiedDate: '2019-07-08T00:00:00.000Z',
           originalTopic: 'u-bahn.action.create'
         }
+      },
+      {
+        topic: 'u-bahn.action.aggregate',
+        originator: 'u-bahn-api',
+        timestamp: '2019-07-08T00:00:00.000Z',
+        'mime-type': 'application/json',
+        payload: {
+          resource: 'user',
+          id: '391a3656-9a01-47d4-8c6d-64b68c44f213',
+          handle: 'user',
+          originalTopic: 'u-bahn.action.create'
+        }
       }
     ],
     Update: [
@@ -240,7 +252,7 @@ module.exports = {
         'mime-type': 'application/json',
         payload: {
           resource: 'user',
-          id: '391a3656-9a01-47d4-8c6d-64b68c44f212',
+          id: '391a3656-9a01-47d4-8c6d-64b68c44f213',
           handle: 'update_user',
           originalTopic: 'u-bahn.action.update'
         }

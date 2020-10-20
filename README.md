@@ -29,7 +29,6 @@ The following parameters can be set in config files or in env variables:
 - GROUPS_MEMBERSHIP_TYPE: the groups membership type that should be processed, default value is 'user'
 - ES.HOST: Elasticsearch host, default value is 'localhost:9200'
 - ES.AWS_REGION: The Amazon region to use when using AWS Elasticsearch service, default value is 'us-east-1'
-- ES.API_VERSION: Elasticsearch API version, default value is '7.4'
 - ES.ACHIEVEMENT_PROVIDER_INDEX: Elasticsearch index name for achievement provider, default value is 'achievement_provider'
 - ES.ACHIEVEMENT_PROVIDER_TYPE: Elasticsearch index type for achievement provider, default value is '_doc'
 - ES.ATTRIBUTE_INDEX: Elasticsearch index name for attribute, default value is 'attribute'
@@ -53,6 +52,7 @@ The following parameters can be set in config files or in env variables:
 - ES.USER_SKILL_PROPERTY_NAME: the user property name of skill, default value is 'skills'
 - ES.ORGANIZATION_SKILLPROVIDER_PROPERTY_NAME: the org property name of org skill providers, default value is 'skillProviders'
 - ES.USER_GROUP_PROPERTY_NAME: the user property name of group, default value is 'groups'
+- ENRICH_USER_PIPELINE_NAME: the user enrich pipeline name, default value is 'enrich_user'
 
 There is a `/health` endpoint that checks for the health of the app. This sets up an expressjs server and listens on the environment variable `PORT`. It's not part of the configuration file and needs to be passed as an environment variable
 

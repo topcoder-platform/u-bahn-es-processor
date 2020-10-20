@@ -32,6 +32,9 @@ async function processCreate (message, transactionId) {
       body: _.omit(message.payload, ['resource', 'originalTopic']),
       refresh: 'wait_for'
     })
+    if (topResources[resource].enrichPolicy) {
+      await client.enrich.executePolicy({ name: topResources[resource].enrichPolicy })
+    }
   } else if (_.includes(_.keys(userResources), resource)) {
     // process user resources such as userSkill, userAttribute...
     const userResource = userResources[resource]
@@ -101,7 +104,7 @@ async function processUpdate (message, transactionId) {
     const client = await helper.getESClient()
     const { index, type } = topResources[resource]
     const id = message.payload.id
-    const source = await client.get({ index, type, id, transactionId })
+    const { body: source } = await client.get({ index, type, id, transactionId })
     await client.update({
       index,
       type,
@@ -114,6 +117,9 @@ async function processUpdate (message, transactionId) {
       if_primary_term: source._primary_term,
       refresh: 'wait_for'
     })
+    if (topResources[resource].enrichPolicy) {
+      await client.enrich.executePolicy({ name: topResources[resource].enrichPolicy })
+    }
   } else if (_.includes(_.keys(userResources), resource)) {
     // process user resources such as userSkill, userAttribute...
     const userResource = userResources[resource]
@@ -190,6 +196,9 @@ async function processDelete (message, transactionId) {
       transactionId,
       refresh: 'wait_for'
     })
+    if (topResources[resource].enrichPolicy) {
+      await client.enrich.executePolicy({ name: topResources[resource].enrichPolicy })
+    }
   } else if (_.includes(_.keys(userResources), resource)) {
     // process user resources such as userSkill, userAttribute...
     const userResource = userResources[resource]
