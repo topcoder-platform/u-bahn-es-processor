@@ -126,7 +126,7 @@ async function updateUser (userId, body, seqNo, primaryTerm, transactionId) {
     body,
     if_seq_no: seqNo,
     if_primary_term: primaryTerm,
-    pipeline: config.get('ES.ENRICH_USER_PIPELINE_NAME'),
+    pipeline: config.get('ES.ENRICHMENT.user.pipelineId'),
     refresh: 'wait_for'
   })
 }
@@ -153,16 +153,17 @@ async function getOrg (organizationId, transactionId) {
  */
 async function updateOrg (organizationId, body, seqNo, primaryTerm, transactionId) {
   const client = await getESClient()
-  await client.update({
+  await client.index({
     index: config.get('ES.ORGANIZATION_INDEX'),
     type: config.get('ES.ORGANIZATION_TYPE'),
     id: organizationId,
     transactionId,
-    body: { doc: body },
+    body,
     if_seq_no: seqNo,
     if_primary_term: primaryTerm,
     refresh: 'wait_for'
   })
+  await client.enrich.executePolicy({ name: config.get('ES.ENRICHMENT.organization.enrichPolicyName') })
 }
 
 /**

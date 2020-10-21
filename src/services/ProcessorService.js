@@ -24,16 +24,17 @@ async function processCreate (message, transactionId) {
     // process the top resources such as user, skill...
     helper.validProperties(message.payload, ['id'])
     const client = await helper.getESClient()
-    await client.create({
+    await client.index({
       index: topResources[resource].index,
       type: topResources[resource].type,
       id: message.payload.id,
       transactionId,
       body: _.omit(message.payload, ['resource', 'originalTopic']),
+      pipeline: topResources[resource].ingest ? topResources[resource].ingest.pipeline.id : undefined,
       refresh: 'wait_for'
     })
-    if (topResources[resource].enrichPolicy) {
-      await client.enrich.executePolicy({ name: topResources[resource].enrichPolicy })
+    if (topResources[resource].enrich) {
+      await client.enrich.executePolicy({ name: topResources[resource].enrich.policyName })
     }
   } else if (_.includes(_.keys(userResources), resource)) {
     // process user resources such as userSkill, userAttribute...
@@ -105,20 +106,19 @@ async function processUpdate (message, transactionId) {
     const { index, type } = topResources[resource]
     const id = message.payload.id
     const { body: source } = await client.get({ index, type, id, transactionId })
-    await client.update({
+    await client.index({
       index,
       type,
       id,
       transactionId,
-      body: {
-        doc: _.assign(source._source, _.omit(message.payload, ['resource', 'originalTopic']))
-      },
+      body: _.assign(source._source, _.omit(message.payload, ['resource', 'originalTopic'])),
+      pipeline: topResources[resource].ingest ? topResources[resource].ingest.pipeline.id : undefined,
       if_seq_no: source._seq_no,
       if_primary_term: source._primary_term,
       refresh: 'wait_for'
     })
-    if (topResources[resource].enrichPolicy) {
-      await client.enrich.executePolicy({ name: topResources[resource].enrichPolicy })
+    if (topResources[resource].enrich) {
+      await client.enrich.executePolicy({ name: topResources[resource].enrich.policyName })
     }
   } else if (_.includes(_.keys(userResources), resource)) {
     // process user resources such as userSkill, userAttribute...
@@ -129,7 +129,6 @@ async function processUpdate (message, transactionId) {
     logger.info(`Resource validated for ${relateId}`)
     const { seqNo, primaryTerm, user } = await helper.getUser(message.payload.userId, transactionId)
     logger.info(`User fetched ${user.id} and ${relateId}`)
-    // const relateId = message.payload[userResource.relateKey]
 
     // check the resource exist
     if (!user[userResource.propertyName] || !_.some(user[userResource.propertyName], [userResource.relateKey, relateId])) {
@@ -196,9 +195,6 @@ async function processDelete (message, transactionId) {
       transactionId,
       refresh: 'wait_for'
     })
-    if (topResources[resource].enrichPolicy) {
-      await client.enrich.executePolicy({ name: topResources[resource].enrichPolicy })
-    }
   } else if (_.includes(_.keys(userResources), resource)) {
     // process user resources such as userSkill, userAttribute...
     const userResource = userResources[resource]
