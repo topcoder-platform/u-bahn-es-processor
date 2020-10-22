@@ -34,7 +34,10 @@ async function processCreate (message, transactionId) {
       refresh: 'wait_for'
     })
     if (topResources[resource].enrich) {
-      await client.enrich.executePolicy({ name: topResources[resource].enrich.policyName })
+      await client.enrich.executePolicy({
+        name: topResources[resource].enrich.policyName,
+        transactionId
+      })
     }
   } else if (_.includes(_.keys(userResources), resource)) {
     // process user resources such as userSkill, userAttribute...
@@ -118,7 +121,10 @@ async function processUpdate (message, transactionId) {
       refresh: 'wait_for'
     })
     if (topResources[resource].enrich) {
-      await client.enrich.executePolicy({ name: topResources[resource].enrich.policyName })
+      await client.enrich.executePolicy({
+        name: topResources[resource].enrich.policyName,
+        transactionId
+      })
     }
   } else if (_.includes(_.keys(userResources), resource)) {
     // process user resources such as userSkill, userAttribute...
@@ -195,6 +201,12 @@ async function processDelete (message, transactionId) {
       transactionId,
       refresh: 'wait_for'
     })
+    if (topResources[resource].enrich) {
+      await client.enrich.executePolicy({
+        name: topResources[resource].enrich.policyName,
+        transactionId
+      })
+    }
   } else if (_.includes(_.keys(userResources), resource)) {
     // process user resources such as userSkill, userAttribute...
     const userResource = userResources[resource]
