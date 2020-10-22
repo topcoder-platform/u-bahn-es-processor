@@ -8,36 +8,68 @@ const { validProperties } = require('./helper')
 const topResources = {
   achievementprovider: {
     index: config.get('ES.ACHIEVEMENT_PROVIDER_INDEX'),
-    type: config.get('ES.ACHIEVEMENT_PROVIDER_TYPE')
+    type: config.get('ES.ACHIEVEMENT_PROVIDER_TYPE'),
+    enrich: {
+      policyName: config.get('ES.ENRICHMENT.achievementprovider.enrichPolicyName')
+    }
   },
   attribute: {
     index: config.get('ES.ATTRIBUTE_INDEX'),
-    type: config.get('ES.ATTRIBUTE_TYPE')
+    type: config.get('ES.ATTRIBUTE_TYPE'),
+    enrich: {
+      policyName: config.get('ES.ENRICHMENT.attribute.enrichPolicyName')
+    },
+    ingest: {
+      pipeline: {
+        id: config.get('ES.ENRICHMENT.attributegroup.pipelineId')
+      }
+    }
   },
   attributegroup: {
     index: config.get('ES.ATTRIBUTE_GROUP_INDEX'),
-    type: config.get('ES.ATTRIBUTE_GROUP_TYPE')
+    type: config.get('ES.ATTRIBUTE_GROUP_TYPE'),
+    enrich: {
+      policyName: config.get('ES.ENRICHMENT.attributegroup.enrichPolicyName')
+    }
   },
-
   organization: {
     index: config.get('ES.ORGANIZATION_INDEX'),
     type: config.get('ES.ORGANIZATION_TYPE')
   },
   role: {
     index: config.get('ES.ROLE_INDEX'),
-    type: config.get('ES.ROLE_TYPE')
+    type: config.get('ES.ROLE_TYPE'),
+    enrich: {
+      policyName: config.get('ES.ENRICHMENT.role.enrichPolicyName')
+    }
   },
   skill: {
     index: config.get('ES.SKILL_INDEX'),
-    type: config.get('ES.SKILL_TYPE')
+    type: config.get('ES.SKILL_TYPE'),
+    enrich: {
+      policyName: config.get('ES.ENRICHMENT.skill.enrichPolicyName')
+    },
+    ingest: {
+      pipeline: {
+        id: config.get('ES.ENRICHMENT.skillprovider.pipelineId')
+      }
+    }
   },
   skillprovider: {
     index: config.get('ES.SKILL_PROVIDER_INDEX'),
-    type: config.get('ES.SKILL_PROVIDER_TYPE')
+    type: config.get('ES.SKILL_PROVIDER_TYPE'),
+    enrich: {
+      policyName: config.get('ES.ENRICHMENT.skillprovider.enrichPolicyName')
+    }
   },
   user: {
     index: config.get('ES.USER_INDEX'),
-    type: config.get('ES.USER_TYPE')
+    type: config.get('ES.USER_TYPE'),
+    ingest: {
+      pipeline: {
+        id: config.get('ES.ENRICHMENT.user.pipelineId')
+      }
+    }
   }
 }
 

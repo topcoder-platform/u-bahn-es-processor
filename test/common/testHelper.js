@@ -18,11 +18,12 @@ var client
  */
 async function getESRecord (payload) {
   if (topResources[payload.resource]) {
-    return client.getSource({
+    const ret = await client.getSource({
       index: topResources[payload.resource].index,
       type: topResources[payload.resource].type,
       id: payload.id
     })
+    return ret.body
   } else if (organizationResources[payload.resource]) {
     const orgResource = organizationResources[payload.resource]
     const { org } = await helper.getOrg(payload.organizationId)
