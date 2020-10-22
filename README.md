@@ -152,8 +152,3 @@ To run the UBahn ES Processor using docker, follow the below steps
 ## Verification
 
 see [VERIFICATION.md](VERIFICATION.md)
-
-## TODO
-
-- Correct the tests
-- Update API codebase config and README for enrich policy env vars
