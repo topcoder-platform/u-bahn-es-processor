@@ -27,7 +27,7 @@ The following parameters can be set in config files or in env variables:
 - GROUPS_MEMBER_ADD_TOPIC: the add groups member Kafka message topic, default value is 'groups.notification.member.add'
 - GROUPS_MEMBER_DELETE_TOPIC: the delete groups member Kafka message topic, default value is 'groups.notification.member.delete'
 - GROUPS_MEMBERSHIP_TYPE: the groups membership type that should be processed, default value is 'user'
-- ES.HOST: Elasticsearch host, default value is 'localhost:9200'
+- ES_HOST: Elasticsearch host, default value is 'localhost:9200'
 - ES.AWS_REGION: The Amazon region to use when using AWS Elasticsearch service, default value is 'us-east-1'
 - ES.ACHIEVEMENT_PROVIDER_INDEX: Elasticsearch index name for achievement provider, default value is 'achievement_provider'
 - ES.ACHIEVEMENT_PROVIDER_TYPE: Elasticsearch index type for achievement provider, default value is '_doc'
@@ -61,7 +61,9 @@ The following parameters can be set in config files or in env variables:
 - ACHIEVEMENT_PROVIDER_ENRICH_POLICYNAME: The enrich policy for achievement provider. Default is `achievementprovider-policy`
 - SKILL_ENRICH_POLICYNAME: The enrich policy for skill. Default is `skill-policy`
 - ATTRIBUTE_ENRICH_POLICYNAME: The enrich policy for skill. Default is `attribute-policy`
-
+- ELASTICCLOUD_ID: The elastic cloud id, if your elasticsearch instance is hosted on elastic cloud. DO NOT provide a value for ES_HOST if you are using this
+- ELASTICCLOUD_USERNAME: The elastic cloud username for basic authentication. Provide this only if your elasticsearch instance is hosted on elastic cloud
+- ELASTICCLOUD_PASSWORD: The elastic cloud password for basic authentication. Provide this only if your elasticsearch instance is hosted on elastic cloud
 
 There is a `/health` endpoint that checks for the health of the app. This sets up an expressjs server and listens on the environment variable `PORT`. It's not part of the configuration file and needs to be passed as an environment variable
 

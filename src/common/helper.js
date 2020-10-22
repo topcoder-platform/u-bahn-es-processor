@@ -5,7 +5,6 @@
 const AWS = require('aws-sdk')
 const config = require('config')
 const elasticsearch = require('@elastic/elasticsearch')
-const createAwsElasticsearchConnector = require('aws-elasticsearch-connector')
 const _ = require('lodash')
 const Joi = require('@hapi/joi')
 const { Mutex } = require('async-mutex')
@@ -40,15 +39,19 @@ async function getESClient () {
     return esClient
   }
   const host = config.ES.HOST
+  const cloudId = config.ES.ELASTICCLOUD.id
 
-  // AWS ES configuration is different from other providers
-  if (/.*amazonaws.*/.test(host)) {
-    try {
-      esClient = new elasticsearch.Client({
-        ...createAwsElasticsearchConnector(AWS.config),
-        node: host
-      })
-    } catch (error) { console.log(error) }
+  if (cloudId) {
+    // Elastic Cloud configuration
+    esClient = new elasticsearch.Client({
+      cloud: {
+        id: cloudId
+      },
+      auth: {
+        username: config.ES.ELASTICCLOUD.username,
+        password: config.ES.ELASTICCLOUD.password
+      }
+    })
   } else {
     esClient = new elasticsearch.Client({
       node: host

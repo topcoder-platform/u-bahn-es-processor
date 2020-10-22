@@ -24,6 +24,13 @@ module.exports = {
 
   ES: {
     HOST: process.env.ES_HOST || 'http://localhost:9200',
+
+    ELASTICCLOUD: {
+      id: process.env.ELASTICCLOUD_ID,
+      username: process.env.ELASTICCLOUD_USERNAME,
+      password: process.env.ELASTICCLOUD_PASSWORD
+    },
+
     AWS_REGION: process.env.AWS_REGION || 'us-east-1', // AWS Region to be used if we use AWS ES
     ACHIEVEMENT_PROVIDER_INDEX: process.env.ACHIEVEMENT_PROVIDER_INDEX || 'achievement_provider',
     ACHIEVEMENT_PROVIDER_TYPE: process.env.ACHIEVEMENT_PROVIDER_TYPE || '_doc',
