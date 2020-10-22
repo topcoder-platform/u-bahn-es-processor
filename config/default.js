@@ -51,6 +51,33 @@ module.exports = {
 
     ORGANIZATION_SKILLPROVIDER_PROPERTY_NAME: process.env.ORGANIZATION_SKILLPROVIDER_PROPERTY_NAME || 'skillProviders',
 
-    ENRICH_USER_PIPELINE_NAME: process.env.ENRICH_USER_PIPELINE_NAME || 'enrich_user'
+    ENRICHMENT: {
+      attributegroup: {
+        enrichPolicyName: process.env.ATTRIBUTE_GROUP_ENRICH_POLICYNAME || 'attributegroup-policy',
+        pipelineId: process.env.ATTRIBUTE_GROUP_PIPELINE_ID || 'attributegroup-pipeline'
+      },
+      skillprovider: {
+        enrichPolicyName: process.env.SKILL_PROVIDER_ENRICH_POLICYNAME || 'skillprovider-policy',
+        pipelineId: process.env.SKILL_PROVIDER_PIPELINE_ID || 'skillprovider-pipeline'
+      },
+      user: {
+        pipelineId: process.env.USER_PIPELINE_ID || 'user-pipeline'
+      },
+      role: {
+        enrichPolicyName: process.env.ROLE_ENRICH_POLICYNAME || 'role-policy'
+      },
+      achievementprovider: {
+        enrichPolicyName: process.env.ACHIEVEMENT_PROVIDER_ENRICH_POLICYNAME || 'achievementprovider-policy'
+      },
+      skill: {
+        enrichPolicyName: process.env.SKILL_ENRICH_POLICYNAME || 'skill-policy'
+      },
+      attribute: {
+        enrichPolicyName: process.env.ATTRIBUTE_ENRICH_POLICYNAME || 'attribute-policy'
+      },
+      organization: {
+        enrichPolicyName: process.env.ORGANIZATION_ENRICH_POLICYNAME || 'organization-policy'
+      }
+    }
   }
 }

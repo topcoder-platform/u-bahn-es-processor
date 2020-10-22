@@ -52,7 +52,16 @@ The following parameters can be set in config files or in env variables:
 - ES.USER_SKILL_PROPERTY_NAME: the user property name of skill, default value is 'skills'
 - ES.ORGANIZATION_SKILLPROVIDER_PROPERTY_NAME: the org property name of org skill providers, default value is 'skillProviders'
 - ES.USER_GROUP_PROPERTY_NAME: the user property name of group, default value is 'groups'
-- ENRICH_USER_PIPELINE_NAME: the user enrich pipeline name, default value is 'enrich_user'
+- ATTRIBUTE_GROUP_PIPELINE_ID: The pipeline id for enrichment with attribute group. Default is `attributegroup-pipeline`
+- SKILL_PROVIDER_PIPELINE_ID: The pipeline id for enrichment with skill provider. Default is `skillprovider-pipeline`
+- USER_PIPELINE_ID: The pipeline id for enrichment of user details. Default is `user-pipeline`
+- ATTRIBUTE_GROUP_ENRICH_POLICYNAME: The enrich policy for attribute group. Default is `attributegroup-policy`
+- SKILL_PROVIDER_ENRICH_POLICYNAME: The enrich policy for skill provider. Default is `skillprovider-policy`
+- ROLE_ENRICH_POLICYNAME: The enrich policy for role. Default is `role-policy`
+- ACHIEVEMENT_PROVIDER_ENRICH_POLICYNAME: The enrich policy for achievement provider. Default is `achievementprovider-policy`
+- SKILL_ENRICH_POLICYNAME: The enrich policy for skill. Default is `skill-policy`
+- ATTRIBUTE_ENRICH_POLICYNAME: The enrich policy for skill. Default is `attribute-policy`
+
 
 There is a `/health` endpoint that checks for the health of the app. This sets up an expressjs server and listens on the environment variable `PORT`. It's not part of the configuration file and needs to be passed as an environment variable
 
@@ -103,15 +112,10 @@ Configuration for the tests is at `config/test.js`, only add such new configurat
     ```
 
 4. Initialize Elasticsearch index
+    For this, refer to the [Ubahn API](https://github.com/topcoder-platform/u-bahn-api) repository. In this repository, you need to execute the following script (after following their deployment guide):
 
     ```bash
-    npm run init-es
-    ```
-
-    To delete and re-create the index:
-
-    ```bash
-    npm run init-es force
+    npm run insert-data
     ```
 
 5. Start the processor and health check dropin
@@ -148,3 +152,8 @@ To run the UBahn ES Processor using docker, follow the below steps
 ## Verification
 
 see [VERIFICATION.md](VERIFICATION.md)
+
+## TODO
+
+- Correct the tests
+- Update API codebase config and README for enrich policy env vars
