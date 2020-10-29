@@ -4,7 +4,7 @@
 
 const AWS = require('aws-sdk')
 const config = require('config')
-const elasticsearch = require('elasticsearch')
+const elasticsearch = require('@elastic/elasticsearch')
 const _ = require('lodash')
 const Joi = require('@hapi/joi')
 const { Mutex } = require('async-mutex')
@@ -39,29 +39,30 @@ async function getESClient () {
     return esClient
   }
   const host = config.ES.HOST
-  const apiVersion = config.ES.API_VERSION
+  const cloudId = config.ES.ELASTICCLOUD.id
 
-  // AWS ES configuration is different from other providers
-  if (/.*amazonaws.*/.test(host)) {
-    try {
-      esClient = new elasticsearch.Client({
-        apiVersion,
-        host,
-        connectionClass: require('http-aws-es') // eslint-disable-line global-require
-      })
-    } catch (error) { console.log(error) }
+  if (cloudId) {
+    // Elastic Cloud configuration
+    esClient = new elasticsearch.Client({
+      cloud: {
+        id: cloudId
+      },
+      auth: {
+        username: config.ES.ELASTICCLOUD.username,
+        password: config.ES.ELASTICCLOUD.password
+      }
+    })
   } else {
     esClient = new elasticsearch.Client({
-      apiVersion,
-      host
+      node: host
     })
   }
 
   // Patch the transport to enable mutex
   esClient.transport.originalRequest = esClient.transport.request
   esClient.transport.request = async (params) => {
-    const tId = _.get(params.query, 'transactionId')
-    params.query = _.omit(params.query, 'transactionId')
+    const tId = _.get(params.querystring, 'transactionId')
+    params.querystring = _.omit(params.querystring, 'transactionId')
     if (!tId || tId !== transactionId) {
       const release = await esClientMutex.acquire()
       mutexReleaseMap[tId || 'noTransaction'] = release
@@ -106,7 +107,7 @@ function validProperties (payload, keys) {
  */
 async function getUser (userId, transactionId) {
   const client = await getESClient()
-  const user = await client.get({ index: config.get('ES.USER_INDEX'), type: config.get('ES.USER_TYPE'), id: userId, transactionId })
+  const { body: user } = await client.get({ index: config.get('ES.USER_INDEX'), type: config.get('ES.USER_TYPE'), id: userId, transactionId })
   return { seqNo: user._seq_no, primaryTerm: user._primary_term, user: user._source }
 }
 
@@ -120,14 +121,15 @@ async function getUser (userId, transactionId) {
  */
 async function updateUser (userId, body, seqNo, primaryTerm, transactionId) {
   const client = await getESClient()
-  await client.update({
+  await client.index({
     index: config.get('ES.USER_INDEX'),
     type: config.get('ES.USER_TYPE'),
     id: userId,
     transactionId,
-    body: { doc: body },
+    body,
     if_seq_no: seqNo,
     if_primary_term: primaryTerm,
+    pipeline: config.get('ES.ENRICHMENT.user.pipelineId'),
     refresh: 'wait_for'
   })
 }
@@ -140,7 +142,7 @@ async function updateUser (userId, body, seqNo, primaryTerm, transactionId) {
  */
 async function getOrg (organizationId, transactionId) {
   const client = await getESClient()
-  const org = await client.get({ index: config.get('ES.ORGANIZATION_INDEX'), type: config.get('ES.ORGANIZATION_TYPE'), id: organizationId, transactionId })
+  const { body: org } = await client.get({ index: config.get('ES.ORGANIZATION_INDEX'), type: config.get('ES.ORGANIZATION_TYPE'), id: organizationId, transactionId })
   return { seqNo: org._seq_no, primaryTerm: org._primary_term, org: org._source }
 }
 
@@ -154,16 +156,17 @@ async function getOrg (organizationId, transactionId) {
  */
 async function updateOrg (organizationId, body, seqNo, primaryTerm, transactionId) {
   const client = await getESClient()
-  await client.update({
+  await client.index({
     index: config.get('ES.ORGANIZATION_INDEX'),
     type: config.get('ES.ORGANIZATION_TYPE'),
     id: organizationId,
     transactionId,
-    body: { doc: body },
+    body,
     if_seq_no: seqNo,
     if_primary_term: primaryTerm,
     refresh: 'wait_for'
   })
+  await client.enrich.executePolicy({ name: config.get('ES.ENRICHMENT.organization.enrichPolicyName') })
 }
 
 /**

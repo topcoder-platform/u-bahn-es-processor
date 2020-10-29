@@ -27,9 +27,8 @@ The following parameters can be set in config files or in env variables:
 - GROUPS_MEMBER_ADD_TOPIC: the add groups member Kafka message topic, default value is 'groups.notification.member.add'
 - GROUPS_MEMBER_DELETE_TOPIC: the delete groups member Kafka message topic, default value is 'groups.notification.member.delete'
 - GROUPS_MEMBERSHIP_TYPE: the groups membership type that should be processed, default value is 'user'
-- ES.HOST: Elasticsearch host, default value is 'localhost:9200'
+- ES_HOST: Elasticsearch host, default value is 'localhost:9200'
 - ES.AWS_REGION: The Amazon region to use when using AWS Elasticsearch service, default value is 'us-east-1'
-- ES.API_VERSION: Elasticsearch API version, default value is '7.4'
 - ES.ACHIEVEMENT_PROVIDER_INDEX: Elasticsearch index name for achievement provider, default value is 'achievement_provider'
 - ES.ACHIEVEMENT_PROVIDER_TYPE: Elasticsearch index type for achievement provider, default value is '_doc'
 - ES.ATTRIBUTE_INDEX: Elasticsearch index name for attribute, default value is 'attribute'
@@ -53,6 +52,18 @@ The following parameters can be set in config files or in env variables:
 - ES.USER_SKILL_PROPERTY_NAME: the user property name of skill, default value is 'skills'
 - ES.ORGANIZATION_SKILLPROVIDER_PROPERTY_NAME: the org property name of org skill providers, default value is 'skillProviders'
 - ES.USER_GROUP_PROPERTY_NAME: the user property name of group, default value is 'groups'
+- ATTRIBUTE_GROUP_PIPELINE_ID: The pipeline id for enrichment with attribute group. Default is `attributegroup-pipeline`
+- SKILL_PROVIDER_PIPELINE_ID: The pipeline id for enrichment with skill provider. Default is `skillprovider-pipeline`
+- USER_PIPELINE_ID: The pipeline id for enrichment of user details. Default is `user-pipeline`
+- ATTRIBUTE_GROUP_ENRICH_POLICYNAME: The enrich policy for attribute group. Default is `attributegroup-policy`
+- SKILL_PROVIDER_ENRICH_POLICYNAME: The enrich policy for skill provider. Default is `skillprovider-policy`
+- ROLE_ENRICH_POLICYNAME: The enrich policy for role. Default is `role-policy`
+- ACHIEVEMENT_PROVIDER_ENRICH_POLICYNAME: The enrich policy for achievement provider. Default is `achievementprovider-policy`
+- SKILL_ENRICH_POLICYNAME: The enrich policy for skill. Default is `skill-policy`
+- ATTRIBUTE_ENRICH_POLICYNAME: The enrich policy for skill. Default is `attribute-policy`
+- ELASTICCLOUD_ID: The elastic cloud id, if your elasticsearch instance is hosted on elastic cloud. DO NOT provide a value for ES_HOST if you are using this
+- ELASTICCLOUD_USERNAME: The elastic cloud username for basic authentication. Provide this only if your elasticsearch instance is hosted on elastic cloud
+- ELASTICCLOUD_PASSWORD: The elastic cloud password for basic authentication. Provide this only if your elasticsearch instance is hosted on elastic cloud
 
 There is a `/health` endpoint that checks for the health of the app. This sets up an expressjs server and listens on the environment variable `PORT`. It's not part of the configuration file and needs to be passed as an environment variable
 
@@ -103,15 +114,10 @@ Configuration for the tests is at `config/test.js`, only add such new configurat
     ```
 
 4. Initialize Elasticsearch index
+    For this, refer to the [Ubahn API](https://github.com/topcoder-platform/u-bahn-api) repository. In this repository, you need to execute the following script (after following their deployment guide):
 
     ```bash
-    npm run init-es
-    ```
-
-    To delete and re-create the index:
-
-    ```bash
-    npm run init-es force
+    npm run insert-data
     ```
 
 5. Start the processor and health check dropin

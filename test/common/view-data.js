@@ -22,7 +22,7 @@ const view = async (resource, id) => {
   if (_.includes(_.keys(topResources), resource)) {
     const ret = await client.getSource({ index: topResources[resource].index, type: topResources[resource].type, id })
     logger.info('Elasticsearch data:')
-    logger.info(JSON.stringify(ret, null, 4))
+    logger.info(JSON.stringify(ret.body, null, 4))
   } else {
     logger.warn(`resource is invalid, it should in [${_.keys(topResources)}]`)
   }

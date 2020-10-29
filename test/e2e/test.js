@@ -201,7 +201,7 @@ describe('UBahn - Elasticsearch Data Processor E2E Test', () => {
             throw new Error('should not throw error here')
           } catch (e) {
             should.equal(e.statusCode, 404)
-            e.message.should.startWith('[resource_not_found_exception]')
+            e.message.includes('resource_not_found_exception').should.be.true()
           }
         } else if (op !== 'Update' || i < 11) {
           const ret = await getESRecord(testTopics[op][i].payload)
@@ -220,9 +220,9 @@ describe('UBahn - Elasticsearch Data Processor E2E Test', () => {
           await sendMessage(testTopics[op][i])
           await waitJob()
           if (topResources[_.lowerFirst(resource)]) {
-            assertErrorMessage('Not Found')
+            assertErrorMessage('Response Error')
           } else {
-            assertErrorMessage('[resource_not_found_exception]')
+            assertErrorMessage('resource_not_found_exception')
           }
         })
       }
@@ -232,7 +232,7 @@ describe('UBahn - Elasticsearch Data Processor E2E Test', () => {
           await sendMessage(testTopics[op][i])
           await waitJob()
 
-          assertErrorMessage('[version_conflict_engine_exception]')
+          assertErrorMessage('version_conflict_engine_exception')
         })
       }
 
@@ -241,9 +241,9 @@ describe('UBahn - Elasticsearch Data Processor E2E Test', () => {
           await sendMessage(testTopics[op][i])
           await waitJob()
           if (topResources[_.lowerFirst(resource)]) {
-            assertErrorMessage('Not Found')
+            assertErrorMessage('Response Error')
           } else {
-            assertErrorMessage('[resource_not_found_exception]')
+            assertErrorMessage('resource_not_found_exception')
           }
         })
       }
@@ -335,7 +335,7 @@ describe('UBahn - Elasticsearch Data Processor E2E Test', () => {
     it(`test process remove groups member message with user not exist in group`, async () => {
       await sendMessage(groupsTopics.deleteData)
       await waitJob()
-      assertErrorMessage('[resource_not_found_exception]')
+      assertErrorMessage('resource_not_found_exception')
     })
   })
 })

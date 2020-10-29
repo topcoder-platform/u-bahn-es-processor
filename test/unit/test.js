@@ -133,7 +133,7 @@ describe('UBahn - Elasticsearch Data Processor Unit Test', () => {
           } catch (e) {
             should.equal(e.statusCode, 404)
             if (topResources[_.lowerFirst(resource)]) {
-              should.equal(e.message, 'Not Found')
+              should.equal(e.message, 'Response Error')
             } else {
               should.equal(e.message, '[resource_not_found_exception]')
               helper.checkEsMutexRelease('transaction_11111')

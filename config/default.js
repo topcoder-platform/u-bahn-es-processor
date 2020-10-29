@@ -23,9 +23,15 @@ module.exports = {
   GROUPS_MEMBERSHIP_TYPE: process.env.GROUPS_MEMBERSHIP_TYPE || 'user',
 
   ES: {
-    HOST: process.env.ES_HOST || 'localhost:9200',
+    HOST: process.env.ES_HOST || 'http://localhost:9200',
+
+    ELASTICCLOUD: {
+      id: process.env.ELASTICCLOUD_ID,
+      username: process.env.ELASTICCLOUD_USERNAME,
+      password: process.env.ELASTICCLOUD_PASSWORD
+    },
+
     AWS_REGION: process.env.AWS_REGION || 'us-east-1', // AWS Region to be used if we use AWS ES
-    API_VERSION: process.env.ES_API_VERSION || '7.4',
     ACHIEVEMENT_PROVIDER_INDEX: process.env.ACHIEVEMENT_PROVIDER_INDEX || 'achievement_provider',
     ACHIEVEMENT_PROVIDER_TYPE: process.env.ACHIEVEMENT_PROVIDER_TYPE || '_doc',
     ATTRIBUTE_INDEX: process.env.ATTRIBUTE_INDEX || 'attribute',
@@ -50,6 +56,35 @@ module.exports = {
     USER_SKILL_PROPERTY_NAME: process.env.USER_SKILL_PROPERTY_NAME || 'skills',
     USER_GROUP_PROPERTY_NAME: process.env.USER_GROUP_PROPERTY_NAME || 'groups',
 
-    ORGANIZATION_SKILLPROVIDER_PROPERTY_NAME: process.env.ORGANIZATION_SKILLPROVIDER_PROPERTY_NAME || 'skillProviders'
+    ORGANIZATION_SKILLPROVIDER_PROPERTY_NAME: process.env.ORGANIZATION_SKILLPROVIDER_PROPERTY_NAME || 'skillProviders',
+
+    ENRICHMENT: {
+      attributegroup: {
+        enrichPolicyName: process.env.ATTRIBUTE_GROUP_ENRICH_POLICYNAME || 'attributegroup-policy',
+        pipelineId: process.env.ATTRIBUTE_GROUP_PIPELINE_ID || 'attributegroup-pipeline'
+      },
+      skillprovider: {
+        enrichPolicyName: process.env.SKILL_PROVIDER_ENRICH_POLICYNAME || 'skillprovider-policy',
+        pipelineId: process.env.SKILL_PROVIDER_PIPELINE_ID || 'skillprovider-pipeline'
+      },
+      user: {
+        pipelineId: process.env.USER_PIPELINE_ID || 'user-pipeline'
+      },
+      role: {
+        enrichPolicyName: process.env.ROLE_ENRICH_POLICYNAME || 'role-policy'
+      },
+      achievementprovider: {
+        enrichPolicyName: process.env.ACHIEVEMENT_PROVIDER_ENRICH_POLICYNAME || 'achievementprovider-policy'
+      },
+      skill: {
+        enrichPolicyName: process.env.SKILL_ENRICH_POLICYNAME || 'skill-policy'
+      },
+      attribute: {
+        enrichPolicyName: process.env.ATTRIBUTE_ENRICH_POLICYNAME || 'attribute-policy'
+      },
+      organization: {
+        enrichPolicyName: process.env.ORGANIZATION_ENRICH_POLICYNAME || 'organization-policy'
+      }
+    }
   }
 }
