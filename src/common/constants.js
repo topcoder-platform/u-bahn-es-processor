@@ -10,18 +10,26 @@ const topResources = {
     index: config.get('ES.ACHIEVEMENT_PROVIDER_INDEX'),
     type: config.get('ES.ACHIEVEMENT_PROVIDER_TYPE'),
     enrich: {
-      policyName: config.get('ES.ENRICHMENT.achievementprovider.enrichPolicyName')
+      policyName: config.get('ES.ENRICHMENT.achievementprovider.enrichPolicyName'),
+      enrichFields: ['id', 'achievementsProviderId', 'name', 'uri', 'certifierId', 'certifiedDate', 'created', 'updated', 'createdBy', 'updatedBy']
     }
   },
   attribute: {
     index: config.get('ES.ATTRIBUTE_INDEX'),
     type: config.get('ES.ATTRIBUTE_TYPE'),
     enrich: {
-      policyName: config.get('ES.ENRICHMENT.attribute.enrichPolicyName')
+      policyName: config.get('ES.ENRICHMENT.attribute.enrichPolicyName'),
+      enrichFields: ['id', 'name', 'attributeGroupId', 'created', 'updated', 'createdBy', 'updatedBy']
     },
     ingest: {
       pipeline: {
-        id: config.get('ES.ENRICHMENT.attributegroup.pipelineId')
+        id: config.get('ES.ENRICHMENT.attributegroup.pipelineId'),
+        processors: [{
+          policyName: config.get('ES.ENRICHMENT.attributegroup.enrichPolicyName'),
+          field: 'attributegroupId',
+          targetField: 'attributegroup',
+          isArray: false
+        }]
       }
     }
   },
@@ -29,7 +37,8 @@ const topResources = {
     index: config.get('ES.ATTRIBUTE_GROUP_INDEX'),
     type: config.get('ES.ATTRIBUTE_GROUP_TYPE'),
     enrich: {
-      policyName: config.get('ES.ENRICHMENT.attributegroup.enrichPolicyName')
+      policyName: config.get('ES.ENRICHMENT.attributegroup.enrichPolicyName'),
+      enrichFields: ['id', 'organizationId', 'name']
     }
   },
   organization: {
@@ -40,18 +49,26 @@ const topResources = {
     index: config.get('ES.ROLE_INDEX'),
     type: config.get('ES.ROLE_TYPE'),
     enrich: {
-      policyName: config.get('ES.ENRICHMENT.role.enrichPolicyName')
+      policyName: config.get('ES.ENRICHMENT.role.enrichPolicyName'),
+      enrichFields: ['id', 'name', 'created', 'updated', 'createdBy', 'updatedBy']
     }
   },
   skill: {
     index: config.get('ES.SKILL_INDEX'),
     type: config.get('ES.SKILL_TYPE'),
     enrich: {
-      policyName: config.get('ES.ENRICHMENT.skill.enrichPolicyName')
+      policyName: config.get('ES.ENRICHMENT.skill.enrichPolicyName'),
+      enrichFields: ['id', 'skillProviderId', 'name', 'externalId', 'uri', 'created', 'updated', 'createdBy', 'updatedBy']
     },
     ingest: {
       pipeline: {
-        id: config.get('ES.ENRICHMENT.skillprovider.pipelineId')
+        id: config.get('ES.ENRICHMENT.skillprovider.pipelineId'),
+        processors: [{
+          policyName: config.get('ES.ENRICHMENT.skillprovider.enrichPolicyName'),
+          field: 'skillProviderId',
+          targetField: 'skillprovider',
+          isArray: false
+        }]
       }
     }
   },
@@ -59,7 +76,8 @@ const topResources = {
     index: config.get('ES.SKILL_PROVIDER_INDEX'),
     type: config.get('ES.SKILL_PROVIDER_TYPE'),
     enrich: {
-      policyName: config.get('ES.ENRICHMENT.skillprovider.enrichPolicyName')
+      policyName: config.get('ES.ENRICHMENT.skillprovider.enrichPolicyName'),
+      enrichFields: ['id', 'name']
     }
   },
   user: {
@@ -67,7 +85,31 @@ const topResources = {
     type: config.get('ES.USER_TYPE'),
     ingest: {
       pipeline: {
-        id: config.get('ES.ENRICHMENT.user.pipelineId')
+        id: config.get('ES.ENRICHMENT.user.pipelineId'),
+        processors: [{
+          policyName: config.get('ES.ENRICHMENT.achievementprovider.enrichPolicyName'),
+          field: 'achievementsProviderId',
+          targetField: config.get('ES.USER_ACHIEVEMENT_PROPERTY_NAME'),
+          isArray: true
+        },
+        {
+          policyName: config.get('ES.ENRICHMENT.attribute.enrichPolicyName'),
+          field: 'attributeId',
+          targetField: config.get('ES.USER_ATTRIBUTE_PROPERTY_NAME'),
+          isArray: true
+        },
+        {
+          policyName: config.get('ES.ENRICHMENT.role.enrichPolicyName'),
+          field: 'roleId',
+          targetField: config.get('ES.USER_ROLE_PROPERTY_NAME'),
+          isArray: true
+        },
+        {
+          policyName: config.get('ES.ENRICHMENT.skill.enrichPolicyName'),
+          field: 'skillId',
+          targetField: config.get('ES.USER_SKILL_PROPERTY_NAME'),
+          isArray: true
+        }]
       }
     }
   }

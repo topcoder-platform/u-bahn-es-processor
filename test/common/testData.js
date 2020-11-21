@@ -1,14 +1,14 @@
 module.exports = {
   fields: {
     achievement: {
-      createIndex: 1,
-      updateIndex: 1,
+      createIndex: 2,
+      updateIndex: 2,
       deleteIndex: 0,
       requiredFields: ['payload.resource', 'payload.userId', 'payload.achievementsProviderId']
     },
     achievementprovider: {
-      createIndex: 2,
-      updateIndex: 2,
+      createIndex: 1,
+      updateIndex: 1,
       deleteIndex: 1,
       requiredFields: ['payload.resource', 'payload.id']
     },
@@ -37,14 +37,14 @@ module.exports = {
       requiredFields: ['payload.resource', 'payload.id']
     },
     skill: {
-      createIndex: 7,
-      updateIndex: 7,
+      createIndex: 8,
+      updateIndex: 8,
       deleteIndex: 6,
       requiredFields: ['payload.resource', 'payload.id']
     },
     skillprovider: {
-      createIndex: 8,
-      updateIndex: 8,
+      createIndex: 7,
+      updateIndex: 7,
       deleteIndex: 7,
       requiredFields: ['payload.resource', 'payload.id']
     },
@@ -92,13 +92,9 @@ module.exports = {
         timestamp: '2019-07-08T00:00:00.000Z',
         'mime-type': 'application/json',
         payload: {
-          resource: 'achievement',
-          userId: '391a3656-9a01-47d4-8c6d-64b68c44f212',
-          achievementsProviderId: 'c77326d8-ef16-4be0-b844-d5c384b7bb8b',
-          name: 'achievement',
-          uri: 'https://google.com',
-          certifierId: 'b8726ca1-557e-4502-8f9b-25044b9c123d',
-          certifiedDate: '2019-07-08T00:00:00.000Z',
+          resource: 'achievementprovider',
+          id: '7b4f98b1-5831-45fe-a71f-8454d11eb8e8',
+          name: 'achievementprovider',
           originalTopic: 'u-bahn.action.create'
         }
       },
@@ -108,9 +104,13 @@ module.exports = {
         timestamp: '2019-07-08T00:00:00.000Z',
         'mime-type': 'application/json',
         payload: {
-          resource: 'achievementprovider',
-          id: '7b4f98b1-5831-45fe-a71f-8454d11eb8e8',
-          name: 'achievementprovider',
+          resource: 'achievement',
+          userId: '391a3656-9a01-47d4-8c6d-64b68c44f212',
+          achievementsProviderId: '7b4f98b1-5831-45fe-a72f-8454d11eb8e8',
+          name: 'achievement',
+          uri: 'https://google.com',
+          certifierId: 'b8726ca1-557e-4502-8f9b-25044b9c123d',
+          certifiedDate: '2019-07-08T00:00:00.000Z',
           originalTopic: 'u-bahn.action.create'
         }
       },
@@ -170,12 +170,9 @@ module.exports = {
         timestamp: '2019-07-08T00:00:00.000Z',
         'mime-type': 'application/json',
         payload: {
-          resource: 'skill',
-          id: 'a75d95d7-6ab8-472d-8103-19d7e642e8f7',
-          skillProviderId: '63061b84-9784-4b71-b695-4a777eeb7601',
-          externalId: 'ba395d36-6ce8-4bd1-9d6c-754f0389abcb',
-          uri: 'https://google.com',
-          name: 'skill',
+          resource: 'skillprovider',
+          id: '2375564d-c5eb-4b80-9b35-465c6b700ac1',
+          name: 'skillprovider',
           originalTopic: 'u-bahn.action.create'
         }
       },
@@ -185,9 +182,12 @@ module.exports = {
         timestamp: '2019-07-08T00:00:00.000Z',
         'mime-type': 'application/json',
         payload: {
-          resource: 'skillprovider',
-          id: '2375564d-c5eb-4b80-9b35-465c6b700ac1',
-          name: 'skillprovider',
+          resource: 'skill',
+          id: 'a75d95d7-6ab8-472d-8103-19d7e642e8f7',
+          skillProviderId: '2375564d-c5eb-4b80-9b35-465c6b700ac1',
+          externalId: 'ba395d36-6ce8-4bd1-9d6c-754f0389abcb',
+          uri: 'https://google.com',
+          name: 'skill',
           originalTopic: 'u-bahn.action.create'
         }
       },
@@ -212,7 +212,7 @@ module.exports = {
         payload: {
           resource: 'userrole',
           userId: '391a3656-9a01-47d4-8c6d-64b68c44f212',
-          roleId: '22028da5-0563-48e8-b84c-e480eb8ed98c',
+          roleId: '288446f1-02dc-4fc7-b74e-ab7ea3033a57',
           originalTopic: 'u-bahn.action.create'
         }
       },
@@ -224,7 +224,7 @@ module.exports = {
         payload: {
           resource: 'userskill',
           userId: '391a3656-9a01-47d4-8c6d-64b68c44f212',
-          skillId: '8a8c8d3a-9165-4dae-8a8c-f828cbe01d5d',
+          skillId: 'b75d95d7-6ab8-472d-8103-19d7e642e8f7',
           metricValue: 'userskill',
           certifierId: '7cf786d9-a8c0-48ed-a7cc-09dcf91d904c',
           certifiedDate: '2019-07-08T00:00:00.000Z',
@@ -263,11 +263,9 @@ module.exports = {
         timestamp: '2019-07-08T00:00:00.000Z',
         'mime-type': 'application/json',
         payload: {
-          resource: 'achievement',
-          userId: '391a3656-9a01-47d4-8c6d-64b68c44f212',
-          achievementsProviderId: 'c77326d8-ef16-4be0-b844-d5c384b7bb8b',
+          resource: 'achievementprovider',
+          id: '7b4f98b1-5831-45fe-a71f-8454d11eb8e8',
           name: 'update_name',
-          uri: 'https://facebook.com',
           originalTopic: 'u-bahn.action.update'
         }
       },
@@ -277,9 +275,11 @@ module.exports = {
         timestamp: '2019-07-08T00:00:00.000Z',
         'mime-type': 'application/json',
         payload: {
-          resource: 'achievementprovider',
-          id: '7b4f98b1-5831-45fe-a71f-8454d11eb8e8',
+          resource: 'achievement',
+          userId: '391a3656-9a01-47d4-8c6d-64b68c44f212',
+          achievementsProviderId: '7b4f98b1-5831-45fe-a72f-8454d11eb8e8',
           name: 'update_name',
+          uri: 'https://facebook.com',
           originalTopic: 'u-bahn.action.update'
         }
       },
@@ -339,12 +339,9 @@ module.exports = {
         timestamp: '2019-07-08T00:00:00.000Z',
         'mime-type': 'application/json',
         payload: {
-          resource: 'skill',
-          id: 'a75d95d7-6ab8-472d-8103-19d7e642e8f7',
-          skillProviderId: '63061b84-9784-4b71-b695-4a777eeb7601',
-          externalId: 'ba395d36-6ce8-4bd1-9d6c-754f0389abcb',
-          uri: 'https://facebook.com',
-          name: 'update_skill',
+          resource: 'skillprovider',
+          id: '2375564d-c5eb-4b80-9b35-465c6b700ac1',
+          name: 'update_skillprovider',
           originalTopic: 'u-bahn.action.update'
         }
       },
@@ -354,9 +351,12 @@ module.exports = {
         timestamp: '2019-07-08T00:00:00.000Z',
         'mime-type': 'application/json',
         payload: {
-          resource: 'skillprovider',
-          id: '2375564d-c5eb-4b80-9b35-465c6b700ac1',
-          name: 'update_skillprovider',
+          resource: 'skill',
+          id: 'a75d95d7-6ab8-472d-8103-19d7e642e8f7',
+          skillProviderId: '2375564d-c5eb-4b80-9b35-465c6b700ac1',
+          externalId: 'ba395d36-6ce8-4bd1-9d6c-754f0389abcb',
+          uri: 'https://facebook.com',
+          name: 'update_skill',
           originalTopic: 'u-bahn.action.update'
         }
       },
@@ -381,7 +381,7 @@ module.exports = {
         payload: {
           resource: 'userskill',
           userId: '391a3656-9a01-47d4-8c6d-64b68c44f212',
-          skillId: '8a8c8d3a-9165-4dae-8a8c-f828cbe01d5d',
+          skillId: 'b75d95d7-6ab8-472d-8103-19d7e642e8f7',
           metricValue: 'update_userskill',
           originalTopic: 'u-bahn.action.update'
         }
@@ -537,7 +537,7 @@ module.exports = {
         payload: {
           resource: 'achievement',
           userId: '391a3656-9a01-47d4-8c6d-64b68c44f212',
-          achievementsProviderId: 'c77326d8-ef16-4be0-b844-d5c384b7bb8b',
+          achievementsProviderId: '7b4f98b1-5831-45fe-a72f-8454d11eb8e8',
           originalTopic: 'u-bahn.action.delete'
         }
       },
@@ -639,7 +639,7 @@ module.exports = {
         payload: {
           resource: 'userrole',
           userId: '391a3656-9a01-47d4-8c6d-64b68c44f212',
-          roleId: '22028da5-0563-48e8-b84c-e480eb8ed98c',
+          roleId: '288446f1-02dc-4fc7-b74e-ab7ea3033a57',
           originalTopic: 'u-bahn.action.delete'
         }
       },
@@ -651,7 +651,7 @@ module.exports = {
         payload: {
           resource: 'userskill',
           userId: '391a3656-9a01-47d4-8c6d-64b68c44f212',
-          skillId: '8a8c8d3a-9165-4dae-8a8c-f828cbe01d5d',
+          skillId: 'b75d95d7-6ab8-472d-8103-19d7e642e8f7',
           originalTopic: 'u-bahn.action.delete'
         }
       },

@@ -12,7 +12,6 @@
  * node src/init-es force
  */
 
-const config = require('config')
 const _ = require('lodash')
 const logger = require('../../src/common/logger')
 const helper = require('../../src/common/helper')
@@ -33,17 +32,19 @@ const init = async (isForce) => {
   if (isForce) {
     await clearES()
   }
+  const processors = {}
   for (const key in topResources) {
     const exists = await client.indices.exists({ index: topResources[key].index })
+    const top = topResources[key]
     if (exists.body) {
-      logger.info(`The index ${topResources[key].index} exists.`)
+      logger.info(`The index ${top.index} exists.`)
     } else {
-      logger.info(`The index ${topResources[key].index} will be created.`)
+      logger.info(`The index ${top.index} will be created.`)
       await client.indices.create({
-        index: topResources[key].index,
+        index: top.index,
         body: {
           mappings: {
-            properties: _(topResources[key].mappingFields).map(p => [p, { type: 'keyword' }]).fromPairs()
+            properties: _(_.get(top, 'enrich.enrichFields', [])).map(p => [p, { type: 'keyword' }]).fromPairs()
           }
         }
       })
@@ -66,66 +67,90 @@ const init = async (isForce) => {
         }
       }
     }
-  }
-  const processors = []
-  for (const key in userResources) {
-    logger.info(`The enrich policy ${key}-policy will be created.`)
-    const top = topResources[userResources[key].relateTopResource]
-    await client.enrich.putPolicy({
-      name: top.enrichPolicy,
-      body: {
-        match: {
-          indices: top.index,
-          match_field: 'id',
-          enrich_fields: top.mappingFields
-        }
-      }
-    })
-    await client.enrich.executePolicy({ name: top.enrichPolicy })
-    processors.push({
-      foreach: {
-        field: userResources[key].propertyName,
-        ignore_missing: true,
-        processor: {
-          enrich: {
-            policy_name: top.enrichPolicy,
-            ignore_missing: true,
-            field: `_ingest._value.${userResources[key].relateKey}`,
-            target_field: '_ingest._value'
+    if (top['enrich']) {
+      logger.info(`The enrich policy ${top.enrich.policyName} will be created.`)
+      await client.enrich.putPolicy({
+        name: top.enrich.policyName,
+        body: {
+          match: {
+            indices: top.index,
+            match_field: 'id',
+            enrich_fields: top.enrich.enrichFields
           }
         }
+      })
+      await client.enrich.executePolicy({ name: top.enrich.policyName })
+    }
+    if (top['ingest']) {
+      _.each(top.ingest.pipeline.processors, processor => {
+        if (!processors[top.ingest.pipeline.id]) {
+          processors[top.ingest.pipeline.id] = []
+        }
+        if (processor.isArray) {
+          processors[top.ingest.pipeline.id].push({
+            foreach: {
+              field: processor.targetField,
+              ignore_missing: true,
+              processor: {
+                enrich: {
+                  policy_name: processor.policyName,
+                  ignore_missing: true,
+                  field: `_ingest._value.${processor.field}`,
+                  target_field: '_ingest._value'
+                }
+              }
+            }
+          })
+        } else {
+          processors[top.ingest.pipeline.id].push({
+            enrich: {
+              policy_name: processor.policyName,
+              ignore_missing: true,
+              field: processor.field,
+              target_field: processor.targetField
+            }
+          })
+        }
+      })
+    }
+  }
+
+  for (const key in processors) {
+    logger.info(`The pipeline ${key} will be created.`)
+    await client.ingest.putPipeline({
+      id: key,
+      body: {
+        processors: processors[key]
       }
     })
   }
-
-  logger.info(`The pipeline ${config.ES.ENRICH_USER_PIPELINE_NAME} will be created.`)
-  await client.ingest.putPipeline({
-    id: config.ES.ENRICH_USER_PIPELINE_NAME,
-    body: {
-      processors
-    }
-  })
 }
 
 /**
  * Delete elastic search index
  */
 const clearES = async () => {
-  try {
-    logger.info(`Delete pipeline ${config.ES.ENRICH_USER_PIPELINE_NAME} if any.`)
-    await client.ingest.deletePipeline({ id: config.ES.ENRICH_USER_PIPELINE_NAME })
-  } catch (err) {
-    // ignore
+  for (const key in topResources) {
+    if (topResources[key].ingest) {
+      try {
+        logger.info(`Delete pipeline ${topResources[key].ingest.pipeline.id} if any.`)
+        await client.ingest.deletePipeline({ id: topResources[key].ingest.pipeline.id })
+      } catch (err) {
+        // ignore
+      }
+    }
   }
-  for (const key in userResources) {
-    try {
-      const policyName = topResources[userResources[key].relateTopResource].enrichPolicy
-      logger.info(`Delete enrich policy ${policyName} if any.`)
-      await client.enrich.deletePolicy({
-        name: policyName
-      })
-    } catch (err) {
-    // ignore
+  for (const key in topResources) {
+    if (topResources[key].enrich) {
+      try {
+        const policyName = topResources[key].enrich.policyName
+        logger.info(`Delete enrich policy ${policyName} if any.`)
+        await client.enrich.deletePolicy({
+          name: policyName
+        })
+      } catch (err) {
+      // ignore
+      }
     }
   }
   for (const key in topResources) {
@@ -145,7 +170,7 @@ if (!module.parent) {
     logger.info('done')
     process.exit()
   }).catch((e) => {
-    logger.error(e)
+    logger.logFullError(e)
     process.exit()
   })
 }

@@ -14,7 +14,7 @@ const should = require('should')
 const logger = require('../../src/common/logger')
 const { fields, testTopics, groupsTopics } = require('../common/testData')
 const { init, clearES } = require('../common/init-es')
-const { getESRecord, getESGroupRecord } = require('../common/testHelper')
+const { getESRecord, getESGroupRecord, getExpectValue } = require('../common/testHelper')
 
 describe('UBahn - Elasticsearch Data Processor E2E Test', () => {
   let app
@@ -208,7 +208,8 @@ describe('UBahn - Elasticsearch Data Processor E2E Test', () => {
           if (testTopics[op][i].payload.resource === 'user') {
             should.equal(ret.handle, testTopics[op][i].payload.handle)
           } else {
-            should.deepEqual(ret, _.omit(testTopics[op][i].payload, ['resource', 'originalTopic']))
+            // should.deepEqual(ret, _.omit(testTopics[op][i].payload, ['resource', 'originalTopic']))
+            should.deepEqual(ret, getExpectValue(testTopics[op][i].payload, testTopics[op]))
           }
         }
       })
@@ -227,7 +228,7 @@ describe('UBahn - Elasticsearch Data Processor E2E Test', () => {
         })
       }
 
-      if (op === 'Create') {
+      if (op === 'Create' && !topResources[_.lowerFirst(resource)]) {
         it(`failure - process create ${resource} with duplicate id`, async () => {
           await sendMessage(testTopics[op][i])
           await waitJob()
