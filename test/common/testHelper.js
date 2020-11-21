@@ -61,6 +61,11 @@ async function getESGroupRecord (userId, groupId) {
   return _.find(user[propertyName], { id: groupId })
 }
 
+/**
+ * Get expect value.
+ * @param {object} payload message payload
+ * @param {array} relationRecord test payload list
+ */
 function getExpectValue (payload, relationRecord) {
   const result = _.omit(payload, ['resource', 'originalTopic'])
   if (topResources[payload.resource] && topResources[payload.resource].ingest) {
