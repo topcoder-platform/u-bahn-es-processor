@@ -13,7 +13,7 @@ const Kafka = require('no-kafka')
 const should = require('should')
 const logger = require('../../src/common/logger')
 const { fields, testTopics, groupsTopics } = require('../common/testData')
-const { init, clearES } = require('../common/init-es')
+const { checkEmpty, clearData } = require('../common/init-es')
 const { getESRecord, getESGroupRecord, getExpectValue } = require('../common/testHelper')
 
 describe('UBahn - Elasticsearch Data Processor E2E Test', () => {
@@ -88,7 +88,10 @@ describe('UBahn - Elasticsearch Data Processor E2E Test', () => {
   }
 
   before(async () => {
-    await init(true)
+    const isESEmpty = await checkEmpty()
+    if (!isESEmpty) {
+      throw Error('Can not run e2e test when elastic search already have data')
+    }
 
     // inject logger with log collector
     logger.info = (message) => {
@@ -134,7 +137,7 @@ describe('UBahn - Elasticsearch Data Processor E2E Test', () => {
       // ignore
     }
 
-    await clearES()
+    await clearData()
   })
 
   beforeEach(() => {

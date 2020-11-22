@@ -20,6 +20,7 @@ const { topResources, userResources } = require('../../src/common/constants')
 let client
 
 let needsNestedTypes = ['user']
+const enrichedFields = ['attributegroup', 'skillprovider']
 
 /**
  * Initialize elastic search index
@@ -44,7 +45,7 @@ const init = async (isForce) => {
         index: top.index,
         body: {
           mappings: {
-            properties: _(_.get(top, 'enrich.enrichFields', [])).map(p => [p, { type: 'keyword' }]).fromPairs()
+            properties: _(_.get(top, 'enrich.enrichFields', [])).map(p => [p, { type: _.includes(enrichedFields, p) ? 'nested' : 'keyword' }]).fromPairs()
           }
         }
       })
@@ -74,44 +75,44 @@ const init = async (isForce) => {
         body: {
           match: {
             indices: top.index,
-            match_field: 'id',
+            match_field: top.enrich.matchField,
             enrich_fields: top.enrich.enrichFields
           }
         }
       })
       await client.enrich.executePolicy({ name: top.enrich.policyName })
     }
-    if (top['ingest']) {
-      _.each(top.ingest.pipeline.processors, processor => {
-        if (!processors[top.ingest.pipeline.id]) {
-          processors[top.ingest.pipeline.id] = []
-        }
-        if (processor.isArray) {
-          processors[top.ingest.pipeline.id].push({
+    if (top.pipeline) {
+      if (top.pipeline.processors) {
+        processors[top.pipeline.id] = []
+        _.each(top.pipeline.processors, processor => {
+          processors[top.pipeline.id].push({
             foreach: {
-              field: processor.targetField,
+              field: processor.referenceField,
               ignore_missing: true,
               processor: {
                 enrich: {
-                  policy_name: processor.policyName,
+                  policy_name: processor.enrichPolicyName,
                   ignore_missing: true,
-                  field: `_ingest._value.${processor.field}`,
-                  target_field: '_ingest._value'
+                  field: processor.field,
+                  target_field: processor.targetField,
+                  max_matches: processor.maxMatches
                 }
               }
             }
           })
-        } else {
-          processors[top.ingest.pipeline.id].push({
-            enrich: {
-              policy_name: processor.policyName,
-              ignore_missing: true,
-              field: processor.field,
-              target_field: processor.targetField
-            }
-          })
-        }
-      })
+        })
+      } else {
+        processors[top.pipeline.id] = [{
+          enrich: {
+            policy_name: top.enrich.policyName,
+            ignore_missing: true,
+            field: top.pipeline.field,
+            target_field: top.pipeline.targetField,
+            max_matches: top.pipeline.maxMatches
+          }
+        }]
+      }
     }
   }
 
@@ -131,10 +132,10 @@ const init = async (isForce) => {
  */
 const clearES = async () => {
   for (const key in topResources) {
-    if (topResources[key].ingest) {
+    if (topResources[key].pipeline) {
       try {
-        logger.info(`Delete pipeline ${topResources[key].ingest.pipeline.id} if any.`)
-        await client.ingest.deletePipeline({ id: topResources[key].ingest.pipeline.id })
+        logger.info(`Delete pipeline ${topResources[key].pipeline.id} if any.`)
+        await client.ingest.deletePipeline({ id: topResources[key].pipeline.id })
       } catch (err) {
         // ignore
       }
@@ -163,6 +164,44 @@ const clearES = async () => {
   }
 }
 
+/**
+ * Check if elastic search is empty
+ */
+const checkEmpty = async () => {
+  if (!client) {
+    client = await helper.getESClient()
+  }
+  for (const key in topResources) {
+    try {
+      const { body } = await client.search({ index: topResources[key].index })
+      if (body.hits.total.value > 0) {
+        return false
+      }
+    } catch (err) {
+    // ignore
+    }
+  }
+  return true
+}
+
+/**
+ * Clear elastic search data
+ */
+const clearData = async () => {
+  if (!client) {
+    client = await helper.getESClient()
+  }
+  for (const key in topResources) {
+    logger.info(`Clear index ${topResources[key].index} data if any.`)
+    try {
+      await client.deleteByQuery({ index: topResources[key].index, body: { query: { match_all: {} } } })
+    } catch (err) {
+    // ignore
+      logger.logFullError(err)
+    }
+  }
+}
+
 if (!module.parent) {
   const isForce = process.argv.length === 3 && process.argv[2] === 'force'
 
@@ -177,5 +216,7 @@ if (!module.parent) {
 
 module.exports = {
   init,
-  clearES
+  clearES,
+  checkEmpty,
+  clearData
 }

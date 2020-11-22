@@ -69,15 +69,25 @@ async function getESGroupRecord (userId, groupId) {
 function getExpectValue (payload, relationRecord) {
   const result = _.omit(payload, ['resource', 'originalTopic'])
   if (topResources[payload.resource] && topResources[payload.resource].ingest) {
-    _.each(topResources[payload.resource].ingest.pipeline.processors, p => {
-      const relationResource = _.keys(_.pickBy(topResources, value => value.enrich && value.enrich.policyName === p.policyName))[0]
+    if (topResources[payload.resource].pipeline) {
+      _.each(topResources[payload.resource].pipeline.processors, p => {
+        const relationResource = _.keys(_.pickBy(topResources, value => value.enrich && value.enrich.policyName === p.policyName))[0]
+        if (relationResource) {
+          const record = _.find(relationRecord, r => r.payload.resource === relationResource && payload[p.field] === r.payload.id)
+          if (record) {
+            result[p.referenceField] = _.pick(record.payload, topResources[relationResource].enrich.enrichFields)
+          }
+        }
+      })
+    } else {
+      const relationResource = _.keys(_.pickBy(topResources, value => value.enrich && value.pipeline && value.pipeline.id === topResources[payload.resource].ingest.pipeline.id))[0]
       if (relationResource) {
-        const record = _.find(relationRecord, r => r.payload.resource === relationResource && payload[p.field] === r.payload.id)
+        const record = _.find(relationRecord, r => r.payload.resource === relationResource && payload[topResources[relationResource].pipeline.field] === r.payload[topResources[relationResource].enrich.matchField])
         if (record) {
-          result[p.targetField] = _.pick(record.payload, topResources[relationResource].enrich.enrichFields)
+          result[topResources[relationResource].pipeline.targetField] = _.pick(record.payload, topResources[relationResource].enrich.enrichFields)
         }
       }
-    })
+    }
   }
   return result
 }
