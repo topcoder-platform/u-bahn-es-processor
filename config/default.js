@@ -84,6 +84,26 @@ module.exports = {
       },
       organization: {
         enrichPolicyName: process.env.ORGANIZATION_ENRICH_POLICYNAME || 'organization-policy'
+      },
+      // sub resources under user
+      achievement: {
+        userField: process.env.USER_ACHIEVEMENT_PROPERTY_NAME || 'achievements'
+      },
+      externalprofile: {
+        userField: process.env.USER_EXTERNALPROFILE_PROPERTY_NAME || 'externalProfiles'
+      },
+      userattribute: {
+        userField: process.env.USER_ATTRIBUTE_PROPERTY_NAME || 'attributes'
+      },
+      userrole: {
+        userField: process.env.USER_ROLE_PROPERTY_NAME || 'roles'
+      },
+      userskill: {
+        userField: process.env.USER_SKILL_PROPERTY_NAME || 'skills'
+      },
+      // sub resources under organization
+      organizationskillprovider: {
+        orgField: process.env.ORGANIZATION_SKILLPROVIDER_PROPERTY_NAME || 'skillProviders'
       }
     }
   }

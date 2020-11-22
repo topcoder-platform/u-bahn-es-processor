@@ -41,12 +41,8 @@ prepare(function (done) {
     .query(true)
     .reply((uri, body) => {
       const id = _.last(_.split(uri, '/')).split('?')[0]
-      if (content[id]) {
-        content[id] = body
-        return [200]
-      } else {
-        return [404]
-      }
+      content[id] = body
+      return [200]
     })
     .delete(() => true)
     .query(true)

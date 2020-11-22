@@ -89,7 +89,7 @@ Configuration for the tests is at `config/test.js`, only add such new configurat
     docker-compose up -d
     ```
 
-3. initialize Elasticsearch, create configured Elasticsearch index: `npm run init-es force`
+3. initialize Elasticsearch. Execute the `insert-data` script in the [API repository](https://github.com/topcoder-platform/u-bahn-api) to set it up and then clear only the data
 
 ## Local deployment
 
