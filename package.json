@@ -7,7 +7,6 @@
     "start": "node src/app.js",
     "lint": "standard",
     "lint:fix": "standard --fix",
-    "init-es": "node test/common/init-es.js",
     "view-data": "node test/common/view-data.js",
     "test": "mocha test/unit/test.js --require test/unit/prepare.js --timeout 20000 --exit",
     "test:cov": "nyc --reporter=html --reporter=text mocha test/unit/test.js --require test/unit/prepare.js --timeout 20000 --exit",
