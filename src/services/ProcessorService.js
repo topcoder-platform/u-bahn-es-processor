@@ -49,6 +49,12 @@ async function processCreate (message, transactionId) {
       user[userResource.propertyName] = []
     }
 
+    // import groups for a new user
+    if (resource === 'externalprofile' && message.payload.externalId) {
+      const userGroups = await helper.getUserGroup(message.payload.externalId)
+      user[config.get('ES.USER_GROUP_PROPERTY_NAME')] = _.unionBy(user[config.get('ES.USER_GROUP_PROPERTY_NAME')], userGroups, 'id')
+    }
+
     // check the resource does not exist
     if (_.some(user[userResource.propertyName], [userResource.relateKey, relateId])) {
       logger.error(`Can't create existed ${resource} with the ${userResource.relateKey}: ${relateId}, userId: ${message.payload.userId}`)
