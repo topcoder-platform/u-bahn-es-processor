@@ -7,7 +7,6 @@
     "start": "node src/app.js",
     "lint": "standard",
     "lint:fix": "standard --fix",
-    "init-es": "node test/common/init-es.js",
     "view-data": "node test/common/view-data.js",
     "test": "mocha test/unit/test.js --require test/unit/prepare.js --timeout 20000 --exit",
     "test:cov": "nyc --reporter=html --reporter=text mocha test/unit/test.js --require test/unit/prepare.js --timeout 20000 --exit",
@@ -35,6 +34,8 @@
     "get-parameter-names": "^0.3.0",
     "lodash": "^4.17.19",
     "no-kafka": "^3.4.3",
+    "axios": "^0.19.2",
+    "tc-core-library-js": "appirio-tech/tc-core-library-js.git#v2.6",
     "topcoder-healthcheck-dropin": "^1.0.3",
     "winston": "^3.2.1"
   },

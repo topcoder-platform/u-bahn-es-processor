@@ -64,6 +64,13 @@ The following parameters can be set in config files or in env variables:
 - ELASTICCLOUD_ID: The elastic cloud id, if your elasticsearch instance is hosted on elastic cloud. DO NOT provide a value for ES_HOST if you are using this
 - ELASTICCLOUD_USERNAME: The elastic cloud username for basic authentication. Provide this only if your elasticsearch instance is hosted on elastic cloud
 - ELASTICCLOUD_PASSWORD: The elastic cloud password for basic authentication. Provide this only if your elasticsearch instance is hosted on elastic cloud
+- AUTH0_URL: The auth0 url, Default is 'https://topcoder-dev.auth0.com/oauth/token'
+- AUTH0_AUDIENCE: The auth0 audience for accessing ubahn api(s), Default is 'https://m2m.topcoder-dev.com/'
+- AUTH0_CLIENT_ID: The auth0 client id
+- AUTH0_CLIENT_SECRET: The auth0 client secret
+- AUTH0_PROXY_SERVER_URL: The auth0 proxy server url
+- TOKEN_CACHE_TIME: The token cache time
+- TOPCODER_GROUP_API: The topcoder groups api, Default is 'https://api.topcoder-dev.com/v5/groups'
 
 There is a `/health` endpoint that checks for the health of the app. This sets up an expressjs server and listens on the environment variable `PORT`. It's not part of the configuration file and needs to be passed as an environment variable
 
@@ -89,7 +96,7 @@ Configuration for the tests is at `config/test.js`, only add such new configurat
     docker-compose up -d
     ```
 
-3. initialize Elasticsearch, create configured Elasticsearch index: `npm run init-es force`
+3. initialize Elasticsearch. Execute the `insert-data` script in the [API repository](https://github.com/topcoder-platform/u-bahn-api) to set it up and then clear only the data
 
 ## Local deployment
 

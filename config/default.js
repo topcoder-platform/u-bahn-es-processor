@@ -14,6 +14,15 @@ module.exports = {
   // Kafka group id
   KAFKA_GROUP_ID: process.env.KAFKA_GROUP_ID || 'ubahn-processor-es',
 
+  TOPCODER_GROUP_API: process.env.TOPCODER_GROUP_API || 'https://api.topcoder-dev.com/v5/groups',
+
+  AUTH0_URL: process.env.AUTH0_URL || 'https://topcoder-dev.auth0.com/oauth/token', // Auth0 credentials
+  AUTH0_AUDIENCE: process.env.AUTH0_AUDIENCE || 'https://m2m.topcoder-dev.com/',
+  TOKEN_CACHE_TIME: process.env.TOKEN_CACHE_TIME,
+  AUTH0_CLIENT_ID: process.env.AUTH0_CLIENT_ID,
+  AUTH0_CLIENT_SECRET: process.env.AUTH0_CLIENT_SECRET,
+  AUTH0_PROXY_SERVER_URL: process.env.AUTH0_PROXY_SERVER_URL,
+
   UBAHN_CREATE_TOPIC: process.env.UBAHN_CREATE_TOPIC || 'u-bahn.action.create',
   UBAHN_UPDATE_TOPIC: process.env.UBAHN_UPDATE_TOPIC || 'u-bahn.action.update',
   UBAHN_DELETE_TOPIC: process.env.UBAHN_DELETE_TOPIC || 'u-bahn.action.delete',
@@ -84,6 +93,26 @@ module.exports = {
       },
       organization: {
         enrichPolicyName: process.env.ORGANIZATION_ENRICH_POLICYNAME || 'organization-policy'
+      },
+      // sub resources under user
+      achievement: {
+        userField: process.env.USER_ACHIEVEMENT_PROPERTY_NAME || 'achievements'
+      },
+      externalprofile: {
+        userField: process.env.USER_EXTERNALPROFILE_PROPERTY_NAME || 'externalProfiles'
+      },
+      userattribute: {
+        userField: process.env.USER_ATTRIBUTE_PROPERTY_NAME || 'attributes'
+      },
+      userrole: {
+        userField: process.env.USER_ROLE_PROPERTY_NAME || 'roles'
+      },
+      userskill: {
+        userField: process.env.USER_SKILL_PROPERTY_NAME || 'skills'
+      },
+      // sub resources under organization
+      organizationskillprovider: {
+        orgField: process.env.ORGANIZATION_SKILLPROVIDER_PROPERTY_NAME || 'skillProviders'
       }
     }
   }

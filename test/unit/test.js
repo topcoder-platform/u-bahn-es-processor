@@ -113,7 +113,7 @@ describe('UBahn - Elasticsearch Data Processor Unit Test', () => {
         })
       }
 
-      if (op === 'Create') {
+      if (op === 'Create' && !topResources[_.lowerFirst(resource)]) {
         it(`failure - process create ${resource} with duplicate id`, async () => {
           try {
             await service.processCreate(testTopics[op][i], 'transaction_11111')
