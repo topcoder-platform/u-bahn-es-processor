@@ -169,6 +169,7 @@ async function updateUser (userId, body, seqNo, primaryTerm, transactionId) {
     if (err && err.meta && err.meta.body && err.meta.body.error) {
       logger.debug(JSON.stringify(err.meta.body.error, null, 4))
     }
+    logger.debug(JSON.stringify(err))
     throw err
   }
 }
