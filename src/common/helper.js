@@ -153,17 +153,26 @@ async function getUser (userId, transactionId) {
  */
 async function updateUser (userId, body, seqNo, primaryTerm, transactionId) {
   const client = await getESClient()
-  await client.index({
-    index: config.get('ES.USER_INDEX'),
-    type: config.get('ES.USER_TYPE'),
-    id: userId,
-    transactionId,
-    body,
-    if_seq_no: seqNo,
-    if_primary_term: primaryTerm,
-    pipeline: config.get('ES.ENRICHMENT.user.pipelineId'),
-    refresh: 'wait_for'
-  })
+  try {
+    await client.index({
+      index: config.get('ES.USER_INDEX'),
+      type: config.get('ES.USER_TYPE'),
+      id: userId,
+      transactionId,
+      body,
+      if_seq_no: seqNo,
+      if_primary_term: primaryTerm,
+      pipeline: config.get('ES.ENRICHMENT.user.pipelineId'),
+      refresh: 'wait_for'
+    })
+    logger.debug('Update user completed')
+  } catch (err) {
+    if (err && err.meta && err.meta.body && err.meta.body.error) {
+      logger.debug(JSON.stringify(err.meta.body.error, null, 4))
+    }
+    logger.debug(JSON.stringify(err))
+    throw err
+  }
 }
 
 /**
