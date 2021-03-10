@@ -165,6 +165,7 @@ async function updateUser (userId, body, seqNo, primaryTerm, transactionId) {
       pipeline: config.get('ES.ENRICHMENT.user.pipelineId'),
       refresh: 'wait_for'
     })
+    logger.debug('Update user completed')
   } catch (err) {
     if (err && err.meta && err.meta.body && err.meta.body.error) {
       logger.debug(JSON.stringify(err.meta.body.error, null, 4))
