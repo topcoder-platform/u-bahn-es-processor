@@ -2,10 +2,10 @@
 FROM node:12.16.3
 
 # Copy the current directory into the Docker image
-COPY . /ubahn-data-processor-es
+COPY . /ubahn-data-processor-es-v2
 
 # Set working directory for future use
-WORKDIR /ubahn-data-processor-es
+WORKDIR /ubahn-data-processor-es-v2
 
 # Install the dependencies from package.json
 RUN npm install
