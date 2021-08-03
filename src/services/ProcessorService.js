@@ -20,7 +20,8 @@ const config = require('config')
  */
 async function processCreate (message, transactionId) {
   const resource = message.payload.resource
-  if (_.includes(_.keys(topResources), resource)) {
+  const fixedTopResources = _.filter(_.keys(topResources), (key) => key !== 'user')
+  if (_.includes(_.keys(fixedTopResources), resource)) {
     // process the top resources such as user, skill...
     helper.validProperties(message.payload, ['id'])
     const client = await helper.getESClient()
@@ -82,7 +83,7 @@ async function processCreate (message, transactionId) {
       await helper.updateOrg(message.payload.organizationId, org, seqNo, primaryTerm, transactionId)
     }
   } else {
-    logger.info(`Ignore this message since resource is not in [${_.union(_.keys(topResources), _.keys(userResources), _.keys(organizationResources))}]`)
+    logger.info(`Ignore this message since resource is not in [${_.union(_.keys(fixedTopResources), _.keys(userResources), _.keys(organizationResources))}]`)
   }
 }
 
@@ -107,7 +108,8 @@ processCreate.schema = {
  */
 async function processUpdate (message, transactionId) {
   const resource = message.payload.resource
-  if (_.includes(_.keys(topResources), resource)) {
+  const fixedTopResources = _.filter(_.keys(topResources), (key) => key !== 'user')
+  if (_.includes(fixedTopResources, resource)) {
     logger.info(`Processing top level resource: ${resource}`)
     // process the top resources such as user, skill...
     helper.validProperties(message.payload, ['id'])
@@ -171,7 +173,7 @@ async function processUpdate (message, transactionId) {
       await helper.updateOrg(message.payload.organizationId, org, seqNo, primaryTerm, transactionId)
     }
   } else {
-    logger.info(`Ignore this message since resource is not in [${_.union(_.keys(topResources), _.keys(userResources), _.keys(organizationResources))}]`)
+    logger.info(`Ignore this message since resource is not in [${_.union(_.keys(fixedTopResources), _.keys(userResources), _.keys(organizationResources))}]`)
   }
 }
 
