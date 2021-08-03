@@ -86,7 +86,7 @@ async function processCreate (message, transactionId) {
       await helper.updateOrg(message.payload.organizationId, org, seqNo, primaryTerm, transactionId)
     }
   } else {
-    logger.info(`Ignore this message since resource is not in [${_.union(_.keys(fixedTopResources), _.keys(userResources), _.keys(organizationResources))}]`)
+    logger.info(`Ignore this message since resource is not in [${_.union(_.values(fixedTopResources), _.keys(userResources), _.keys(organizationResources))}]`)
   }
 }
 
@@ -179,7 +179,7 @@ async function processUpdate (message, transactionId) {
       await helper.updateOrg(message.payload.organizationId, org, seqNo, primaryTerm, transactionId)
     }
   } else {
-    logger.info(`Ignore this message since resource is not in [${_.union(_.keys(fixedTopResources), _.keys(userResources), _.keys(organizationResources))}]`)
+    logger.info(`Ignore this message since resource is not in [${_.union(_.values(fixedTopResources), _.keys(userResources), _.keys(organizationResources))}]`)
   }
 }
 
