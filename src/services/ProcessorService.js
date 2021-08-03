@@ -20,7 +20,10 @@ const config = require('config')
  */
 async function processCreate (message, transactionId) {
   const resource = message.payload.resource
+
+  // shapeup - CQRS standards update
   const fixedTopResources = _.filter(_.keys(topResources), (key) => key !== 'user')
+  
   if (_.includes(_.keys(fixedTopResources), resource)) {
     // process the top resources such as user, skill...
     helper.validProperties(message.payload, ['id'])
@@ -108,7 +111,10 @@ processCreate.schema = {
  */
 async function processUpdate (message, transactionId) {
   const resource = message.payload.resource
+
+  // shapeup - CQRS standards update
   const fixedTopResources = _.filter(_.keys(topResources), (key) => key !== 'user')
+ 
   if (_.includes(fixedTopResources, resource)) {
     logger.info(`Processing top level resource: ${resource}`)
     // process the top resources such as user, skill...
