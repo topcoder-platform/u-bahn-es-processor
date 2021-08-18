@@ -71,19 +71,19 @@ const dataHandler = (messageSet, topic, partition) => Promise.each(messageSet, a
   const transactionId = _.uniqueId('transaction_')
   try {
     if (messageJSON.payload.originalTopic) {
-      switch (messageJSON.payload.originalTopic) {
-        case config.UBAHN_CREATE_TOPIC:
-          await ProcessorService.processCreate(messageJSON, transactionId)
-          break
-        case config.UBAHN_UPDATE_TOPIC:
-          await ProcessorService.processUpdate(messageJSON, transactionId)
-          break
-        case config.UBAHN_DELETE_TOPIC:
-          await ProcessorService.processDelete(messageJSON, transactionId)
-          break
-        default:
-          throw new Error(`Unknown original topic: ${messageJSON.payload.originalTopic}`)
-      }
+      // switch (messageJSON.payload.originalTopic) {
+      //   case config.UBAHN_CREATE_TOPIC:
+      //     await ProcessorService.processCreate(messageJSON, transactionId)
+      //     break
+      //   case config.UBAHN_UPDATE_TOPIC:
+      //     await ProcessorService.processUpdate(messageJSON, transactionId)
+      //     break
+      //   case config.UBAHN_DELETE_TOPIC:
+      //     await ProcessorService.processDelete(messageJSON, transactionId)
+      //     break
+      //   default:
+      //     throw new Error(`Unknown original topic: ${messageJSON.payload.originalTopic}`)
+      // }
     } else {
       switch (topic) {
         case config.GROUPS_MEMBER_ADD_TOPIC:
