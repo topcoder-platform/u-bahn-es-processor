@@ -8,10 +8,7 @@ const elasticsearch = require('@elastic/elasticsearch')
 const _ = require('lodash')
 const Joi = require('@hapi/joi')
 const { Mutex } = require('async-mutex')
-const axios = require('axios')
 const logger = require('./logger')
-const m2mAuth = require('tc-core-library-js').auth.m2m
-const topcoderM2M = m2mAuth(_.pick(config, ['AUTH0_URL', 'AUTH0_AUDIENCE', 'TOKEN_CACHE_TIME', 'AUTH0_PROXY_SERVER_URL']))
 
 AWS.config.region = config.ES.AWS_REGION
 
@@ -21,34 +18,6 @@ let transactionId
 // Mutex to ensure that only one elasticsearch action is carried out at any given time
 const esClientMutex = new Mutex()
 const mutexReleaseMap = {}
-
-/* Function to get M2M token
- * (Topcoder APIs only)
- * @returns {Promise}
- */
-async function getTopcoderM2Mtoken () {
-  return topcoderM2M.getMachineToken(config.AUTH0_CLIENT_ID, config.AUTH0_CLIENT_SECRET)
-}
-
-/**
- * Returns the user in Topcoder identified by the email
- * @param {String} email The user email
- */
-async function getUserGroup (memberId) {
-  const url = config.TOPCODER_GROUP_API
-  const token = await getTopcoderM2Mtoken()
-  const params = { memberId, membershipType: 'user', page: 1 }
-
-  logger.debug(`request GET ${url} with params: ${JSON.stringify(params)}`)
-  let groups = []
-  let groupRes = await axios.get(url, { headers: { Authorization: `Bearer ${token}` }, params })
-  while (groupRes.data.length > 0) {
-    groups = _.concat(groups, _.map(groupRes.data, g => _.pick(g, 'id', 'name')))
-    params.page = params.page + 1
-    groupRes = await axios.get(url, { headers: { Authorization: `Bearer ${token}` }, params })
-  }
-  return groups
-}
 
 /**
  * Get Kafka options
@@ -176,41 +145,6 @@ async function updateUser (userId, body, seqNo, primaryTerm, transactionId) {
 }
 
 /**
- * Function to get org from es
- * @param {String} organizationId
- * @param {String} transactionId
- * @returns {Object} organization
- */
-async function getOrg (organizationId, transactionId) {
-  const client = await getESClient()
-  const { body: org } = await client.get({ index: config.get('ES.ORGANIZATION_INDEX'), type: config.get('ES.ORGANIZATION_TYPE'), id: organizationId, transactionId })
-  return { seqNo: org._seq_no, primaryTerm: org._primary_term, org: org._source }
-}
-
-/**
- * Function to update es organization
- * @param {String} organizationId
- * @param {Number} seqNo
- * @param {Number} primaryTerm
- * @param {String} transactionId
- * @param {Object} body
- */
-async function updateOrg (organizationId, body, seqNo, primaryTerm, transactionId) {
-  const client = await getESClient()
-  await client.index({
-    index: config.get('ES.ORGANIZATION_INDEX'),
-    type: config.get('ES.ORGANIZATION_TYPE'),
-    id: organizationId,
-    transactionId,
-    body,
-    if_seq_no: seqNo,
-    if_primary_term: primaryTerm,
-    refresh: 'wait_for'
-  })
-  await client.enrich.executePolicy({ name: config.get('ES.ENRICHMENT.organization.enrichPolicyName') })
-}
-
-/**
  * Fuction to get an Error with statusCode property
  * @param {String} message error message
  * @param {Number} statusCode
@@ -242,10 +176,7 @@ module.exports = {
   getESClient,
   validProperties,
   getUser,
-  getUserGroup,
   updateUser,
-  getOrg,
-  updateOrg,
   getErrorWithStatus,
   checkEsMutexRelease
 }
