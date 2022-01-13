@@ -23,7 +23,7 @@
     "get-parameter-names": "^0.3.0",
     "lodash": "^4.17.19",
     "no-kafka": "^3.4.3",
-    "axios": "^0.19.2",
+    "axios": "^0.20.0",
     "topcoder-healthcheck-dropin": "^1.0.3",
     "winston": "^3.2.1"
   },
