@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@elastic/elasticsearch": "^7.9.1",
-    "@hapi/joi": "^15.1.0",
+    "@hapi/joi": "^15.1.1",
     "async-mutex": "^0.2.4",
     "aws-sdk": "^2.476.0",
     "bluebird": "^3.5.5",
