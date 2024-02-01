@@ -1,3 +1,5 @@
+DEPRECATED 2/1/2024 https://topcoder.atlassian.net/browse/CORE-203
+
 # UBahn - Elasticsearch Data Processor
 
 ## Dependencies
